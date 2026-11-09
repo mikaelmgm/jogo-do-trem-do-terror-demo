@@ -264,38 +264,36 @@
     .hint { display: none; }
   }
 </style>
+<link rel="stylesheet" href="css/hud3d.css">
 </head>
 <body>
-<canvas id="sky" width="480" height="270" aria-hidden="true"></canvas>
 <canvas id="view" aria-label="Parque 3D: uma ilha flutuante à noite com a casa assombrada, o trem fantasma dando a volta e bonecos assustando os visitantes"></canvas>
 <div id="grime" aria-hidden="true"></div>
 
-<header class="sign plate">
-  <div>
-    <div class="eyebrow">TREM FANTASMA · 3D</div>
-    <h1>CASA ASSOMBRADA</h1>
-    <p>A ilha flutua no escuro. O trem sai da casa, dá a volta e cada boneco na beira do trilho assusta quem passa.</p>
+<div id="topbar">
+  <button class="tb-brand glass" id="menuBtn" aria-label="Abrir o menu">
+    <canvas class="spr" data-spr="ghost" data-scale="2"></canvas>
+    <span class="tb-name"><small>TREM FANTASMA</small>CASA ASSOMBRADA</span>
+    <canvas class="spr" data-spr="ic_menu" data-scale="2"></canvas>
+  </button>
+  <div class="tb-wallet glass" id="wallet">
+    <div class="tb-bal">
+      <span class="tb-l">CARTEIRA · $MEDO</span>
+      <b class="bal" id="medo">10,000</b>
+      <span class="tb-rates"><span class="rate" id="farm">≈ 0/h</span><span class="rate loss" id="loss"></span></span>
+    </div>
+    <div class="tb-cart" id="cartMeter">
+      <div class="carry-top"><span>NO CARRINHO</span><b id="carry">+0,000</b></div>
+      <div class="carry-bar"><i id="carryBar"></i><canvas class="spr cart-ic" id="carryCart" data-spr="cart" data-scale="2"></canvas><canvas class="spr house-ic" data-spr="ic_house" data-scale="2"></canvas></div>
+      <small>cai na carteira quando o trem chega na casa</small>
+    </div>
   </div>
-  <nav class="style-switch" aria-label="Estilo do jogo">
-    <a href="classico.html">CLÁSSICO</a>
-    <span aria-current="page">3D</span>
-  </nav>
-</header>
+</div>
 
 <aside class="panel plate" id="panel" aria-label="Painel do parque">
   <div class="p-head">
-    <div>
-      <div class="bal-l">$MEDO</div>
-      <div class="bal" id="medo">10,000</div>
-      <div class="rate" id="farm">≈ 0/h</div>
-      <div class="rate loss" id="loss"></div>
-    </div>
+    <span class="p-title">PAINEL DO PARQUE</span>
     <button class="btn toggle" id="toggle" aria-expanded="false" aria-controls="pbody">PAINEL</button>
-  </div>
-  <div class="carry">
-    <div class="carry-top"><span>NO CARRINHO</span><b id="carry">+0,000</b></div>
-    <div class="carry-bar"><i id="carryBar"></i></div>
-    <p class="note">Cada susto enche o carrinho. O $MEDO cai na carteira quando ele chega na casa.</p>
   </div>
   <nav class="p-tabs" aria-label="Abas do painel">
     <button id="tabMons" aria-selected="true">BONECOS</button>
@@ -314,6 +312,7 @@
       <h2>NA PISTA</h2>
       <ul class="roster" id="roster"></ul>
     </section>
+    <section class="sec labroot" id="invList"></section>
   </div>
   <div class="p-body labroot" id="itemsBody" hidden><div id="itemsPanel"></div></div>
   <div class="p-body labroot" id="labBody" hidden>
@@ -348,7 +347,7 @@
       </div>
       <div class="seg" style="--n:2">
         <button class="btn" id="modePixel" aria-pressed="false">PIXEL ART</button>
-        <button class="btn" id="modeRaw" aria-pressed="true">3D CRU</button>
+        <button class="btn" id="modeRaw" aria-pressed="true">REALISTA</button>
       </div>
       <label class="range" for="px"><span>Tamanho do pixel</span><output id="pxOut" for="px">3</output></label>
       <input type="range" id="px" min="2" max="6" step="1" value="3">
@@ -390,6 +389,81 @@
 <div id="toasts"></div>
 
 <button class="btn primary" id="expandBtn" hidden></button>
+<div id="dock" class="glass">
+  <button class="dk ride" id="rideBtn"><canvas class="spr" data-spr="ic_eye" data-scale="3"></canvas><span>ANDAR NO TREM<small>primeira pessoa · tecla F</small></span></button>
+  <button class="dk" id="dkPause" title="Pausar ou continuar (espaço)" aria-label="Pausar ou continuar"><canvas class="spr" data-spr="ic_pause" data-scale="2"></canvas></button>
+  <button class="dk" id="dkSpeed" title="Velocidade do jogo" aria-label="Velocidade do jogo">×1</button>
+  <button class="dk" id="dkSound" title="Ligar ou desligar o som" aria-label="Ligar ou desligar o som"><canvas class="spr" data-spr="ic_sound" data-scale="2"></canvas></button>
+  <button class="dk" id="dkHelp" title="Como jogar" aria-label="Como jogar"><canvas class="spr" data-spr="ic_help" data-scale="2"></canvas></button>
+</div>
+
+<div id="fpHud" hidden>
+  <div class="fp-top glass"><canvas class="spr" data-spr="ic_eye" data-scale="2"></canvas><span>PRIMEIRA PESSOA</span><small>arraste para olhar em volta</small></div>
+  <button class="btn fp-exit" id="fpExit">SAIR DO TREM · ESC</button>
+  <div class="fp-msg" id="fpMsg" aria-live="polite"></div>
+  <div id="fpPops"></div>
+  <div class="fp-bottom glass">
+    <div class="fp-heart"><canvas class="spr" id="fpHeart" data-spr="heart" data-scale="3"></canvas><b id="fpBpm">72</b><small>BPM</small></div>
+    <div class="fp-lap">
+      <div class="carry-top"><span>NO CARRINHO</span><b id="fpCarry">+0,000</b></div>
+      <div class="carry-bar"><i id="fpBar"></i></div>
+      <small id="fpNext"></small>
+    </div>
+  </div>
+</div>
+
+<div class="menu" id="menu" hidden>
+  <div class="menu-inner">
+    <div class="logo">
+      <span class="eyebrow">TREM FANTASMA</span>
+      <h1>CASA<br>ASSOMBRADA</h1>
+      <p>Monte o trem fantasma mais lucrativo da ilha. Cada susto vale $MEDO, e cada infarto custa caro.</p>
+    </div>
+    <nav class="menu-btns" id="menuMain" aria-label="Menu principal">
+      <button class="mb primary" id="mPlay"><span id="mPlayTxt">JOGAR</span></button>
+      <button class="mb" id="mRide"><span>ANDAR NO TREM</span><small>primeira pessoa</small></button>
+      <button class="mb" id="mHelp"><span>COMO JOGAR</span></button>
+      <button class="mb" id="mOpts"><span>OPÇÕES</span></button>
+      <a class="mb" href="classico.html"><span>VERSÃO CLÁSSICA</span><small>2D</small></a>
+    </nav>
+    <div class="menu-opts glass" id="menuOpts" hidden>
+      <div class="opt"><span>VISUAL</span><div class="seg" style="--n:2"><button class="btn" id="oReal">REALISTA</button><button class="btn" id="oPixel">PIXEL ART</button></div></div>
+      <div class="opt"><span>QUALIDADE</span><div class="seg" style="--n:3"><button class="btn" data-q="0">BAIXA</button><button class="btn" data-q="1">MÉDIA</button><button class="btn" data-q="2">ALTA</button></div></div>
+      <div class="opt"><span>SOM</span><input type="range" id="oVol" min="0" max="100" step="1" aria-label="Volume"><button class="btn" id="oMute">SOM LIGADO</button></div>
+      <div class="opt"><span>NOMES DOS BONECOS</span><button class="btn" id="oNames">NOMES À MOSTRA</button></div>
+      <div class="opt"><span>PROGRESSO</span><button class="btn danger" id="oReset">APAGAR TODO O PROGRESSO</button></div>
+      <button class="btn primary" id="mBack">VOLTAR</button>
+    </div>
+  </div>
+  <div class="menu-foot"><kbd>ARRASTAR</kbd>girar a ilha<kbd>ROLAR</kbd>zoom<kbd>F</kbd>andar no trem<kbd>M</kbd>mintar<kbd>ESPAÇO</kbd>pausar</div>
+</div>
+
+<div id="tut" hidden>
+  <div class="tut-shade" id="tutShade"></div>
+  <div class="tut-hole" id="tutHole" hidden></div>
+  <div class="tut-box glass" id="tutBox">
+    <canvas id="tutHost" width="16" height="27"></canvas>
+    <div>
+      <b class="tut-name">SR. CALAFRIO</b>
+      <p id="tutText" aria-live="polite"></p>
+      <div class="tut-ctl"><span id="tutDots"></span><button class="btn" id="tutSkip">PULAR</button><button class="btn primary" id="tutNext">PRÓXIMO</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="reveal" id="reveal" hidden>
+  <div class="reveal-box glass">
+    <canvas id="revealCv" width="260" height="260" aria-hidden="true"></canvas>
+    <div class="reveal-txt" id="revealTxt" aria-live="polite">
+      <div class="c-rar" id="rvRar"></div>
+      <div class="rv-name" id="rvName"></div>
+      <p class="note" id="rvInfo"></p>
+      <button class="btn primary" id="rvPlace">COLOCAR NA PISTA</button>
+      <div class="seg" style="--n:2"><button class="btn" id="rvAgain">MINTAR OUTRO</button><button class="btn" id="rvClose">GUARDAR</button></div>
+    </div>
+  </div>
+</div>
+
 <div class="hint">
   <span><kbd>ARRASTAR</kbd>girar (num boneco, gira ele)</span>
   <span><kbd>ROLAR</kbd>zoom</span>
@@ -406,8 +480,17 @@
 <script src="js/state.js"></script>
 <script src="js/lab.js"></script>
 <script src="js/voxels.js"></script>
+<script src="js/cinema3d.js"></script>
+<script src="js/hud3d.js"></script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -619,11 +702,8 @@ const ISLE_TYPES = [
 const ISLE_COST = [4000, 7000, 11000, 16000, 22000, 30000, 40000, 55000];
 const ISLE_ORDER = [1, 3, 5, 4, 6, 8, 7, 9], ISLE_PARENT = { 1: 2, 3: 2, 5: 2, 4: 5, 6: 5, 8: 5, 7: 8, 9: 8 };
 const ISLE_GRID = { 1: [-1, 0], 2: [0, 0], 3: [1, 0], 4: [-1, 1], 5: [0, 1], 6: [1, 1], 7: [-1, 2], 8: [0, 2], 9: [1, 2] };
-// colunas e linhas seguem a tela: com a câmera em 45 graus, a grade fica na diagonal do mundo
-const gridPos = (pos, jx, jz) => {
-  const [c, r] = ISLE_GRID[pos], sx = c * 66 + (r % 2 ? 11 : 0), sy = r * 64;
-  return [(sx + sy) / Math.SQRT2 + jx, (sy - sx) / Math.SQRT2 + jz];
-};
+// distância do centro até a borda de uma ilha, na direção (ux, uz)
+const edgeAt = (land, ux, uz) => 1 / Math.pow(Math.pow(Math.abs(ux) / land[0], 4) + Math.pow(Math.abs(uz) / land[1], 4), 0.25);
 const islesSt = Game.s.lab.isles3d || (Game.s.lab.isles3d = []);
 Game.s.lab.map.islands = islesSt.length;
 LAB_MAP.islands = {
@@ -640,12 +720,26 @@ const ISLES = MAP_MODE === 'islands';
 const PLAN = (() => {
   if (MAP_MODE === 'off') return [];
   if (!ISLES) return MAP3D[MAP_MODE].slice(0, Lab.mapLevel()).map((lo, n) => ({ ...lo, slots: LAB_MAP[MAP_MODE].levels[n].lobe.slots }));
-  const centers = { 2: [0, 0] }, sizes = { 2: 12 };
+  // Cada ilha fica colada na ilha de onde sai a ponte, só com um vão curto entre as duas. A direção segue
+  // a grade (com a câmera em 45 graus ela fica na diagonal do mundo), um pouco torta para parecer natural.
+  const placed = { 2: { c: [0, 0], land: [RX, RZ], reach: 12 } };
   return islesSt.map((it) => {
-    const R = ISLE_RARITY[it.rarity], c = gridPos(it.pos, it.jx, it.jz), par = ISLE_PARENT[it.pos], pc = centers[par];
-    centers[it.pos] = c; sizes[it.pos] = (R.rOut + R.rT) / 2;
-    const l = Math.hypot(c[0] - pc[0], c[1] - pc[1]) || 1, reach = sizes[par];
-    return { c, at: [pc[0] + ((c[0] - pc[0]) / l) * reach, pc[1] + ((c[1] - pc[1]) / l) * reach], rOut: R.rOut, rT: R.rT, land: R.land, slots: R.slots, items: R.items, type: ISLE_TYPES[it.type], bow: it.bow, ph: it.ph, pos: it.pos };
+    const R = ISLE_RARITY[it.rarity], par = ISLE_PARENT[it.pos], P = placed[par];
+    const dc = ISLE_GRID[it.pos][0] - ISLE_GRID[par][0], dr = ISLE_GRID[it.pos][1] - ISLE_GRID[par][1];
+    const a = Math.atan2(dr - dc, dc + dr) + (it.jx / 9) * 0.28, ux = Math.cos(a), uz = Math.sin(a);
+    let dist = edgeAt(P.land, ux, uz) + edgeAt(R.land, ux, uz) + 3.5 + ((it.jz + 9) / 18) * 2.5, c;
+    // se bater em outra ilha, vai um pouco mais para fora
+    for (let k = 0; k < 60; k++, dist += 2) {
+      c = [P.c[0] + ux * dist, P.c[1] + uz * dist];
+      const hit = Object.values(placed).some((o) => {
+        if (o === P) return false;
+        const dx = o.c[0] - c[0], dz = o.c[1] - c[1], l = Math.hypot(dx, dz) || 1;
+        return l < edgeAt(o.land, dx / l, dz / l) + edgeAt(R.land, dx / l, dz / l) + 3;
+      });
+      if (!hit) break;
+    }
+    placed[it.pos] = { c, land: R.land, reach: (R.rOut + R.rT) / 2 };
+    return { c, at: [P.c[0] + ux * P.reach, P.c[1] + uz * P.reach], rOut: R.rOut, rT: R.rT, land: R.land, slots: R.slots, items: R.items, type: ISLE_TYPES[it.type], bow: it.bow, ph: it.ph, pos: it.pos };
   });
 })();
 // a câmera se afasta para caber o que foi comprado
@@ -656,7 +750,7 @@ for (const lo of PLAN) {
 const MAP_S = Math.max(1, Math.hypot(mapBox.x1 - mapBox.x0, mapBox.z1 - mapBox.z0) / Math.hypot(RX * 2, RZ * 2));
 // tamanho do mapa como aparece na tela (a câmera olha em 45 graus): é o que decide o enquadramento
 const mapView = (() => {
-  const all = [{ x: 0, z: 0, r: RX }, ...PLAN.map((lo) => ({ x: lo.c[0], z: lo.c[1], r: Math.max(...lo.land) }))];
+  const all = [{ x: 0, z: 0, r: RX * 1.15 }, ...PLAN.map((lo) => ({ x: lo.c[0], z: lo.c[1], r: Math.max(...lo.land) * 1.15 }))];
   const us = all.flatMap((a) => { const u = (a.x - a.z) / Math.SQRT2; return [u - a.r, u + a.r]; }), vs = all.flatMap((a) => { const v = (a.x + a.z) / Math.SQRT2; return [v - a.r, v + a.r]; });
   const u0 = Math.min(...us), u1 = Math.max(...us), v0 = Math.min(...vs), v1 = Math.max(...vs), cu = (u0 + u1) / 2, cv = (v0 + v1) / 2;
   return { halfU: (u1 - u0) / 2, halfV: (v1 - v0) / 2, x: (cu + cv) / Math.SQRT2, z: (cv - cu) / Math.SQRT2 };
@@ -719,7 +813,7 @@ function attachLobes(base) {
     }
     // as duas pistas da ponte curvam para o mesmo lado, sem se encostar
     const neck = (P, Q) => {
-      const out = [], m = Math.ceil(Math.hypot(Q[0] - P[0], Q[1] - P[1]) / 3.2), bow = lo.bow || 0;
+      const len = Math.hypot(Q[0] - P[0], Q[1] - P[1]), out = [], m = Math.ceil(len / 3.2), bow = (lo.bow || 0) * Math.min(1, len / 28);
       for (let i = 1; i < m; i++) { const u = i / m, b = Math.sin(Math.PI * u) * bow; out.push([lerp(P[0], Q[0], u) + tx * b, lerp(P[1], Q[1], u) + tz * b]); }
       return out;
     };
@@ -787,7 +881,7 @@ Game.slotOrder = slots.slice().sort((a, b) => a.d - b.d).map((s) => s.i);
 CFG.slots = slots.length;
 Game.trackLen = LAP * 10;   // na conta do Game, CFG.speed (40) equivale a VMAX (4) aqui
 
-const G = PLAN.length ? 190 : 24, GW = G * 2;
+const G = PLAN.length ? Math.ceil(Math.max(RX, ...PLAN.map((lo) => Math.max(Math.abs(lo.c[0]) + lo.land[0], Math.abs(lo.c[1]) + lo.land[1]))) + 6) : 24, GW = G * 2;
 const grid = new Array(GW * GW).fill(null);
 const cellAt = (x, z) => {
   const gx = Math.floor(x) + G, gz = Math.floor(z) + G;
@@ -851,7 +945,7 @@ for (let s = 0; s < LAP; s += 0.5) {
   const mx = (a.x + b.x) / 2, mz = (a.z + b.z) / 2, ry = Math.atan2(-tz, tx), nx = -tz, nz = tx;
   [-0.42, 0.42].forEach((sd, k) => Rl.box(mx + nx * sd, 0.09, mz + nz * sd, dl + 0.03, 0.1, 0.09, plainTrack ? '#8b87a6' : TS.rails[k], ry, 0.03));
 }
-const railMat = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true });
+const railMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, metalness: 0.35, roughness: 0.3 });
 
 /* ---------- casa assombrada ---------- */
 const pickables = [];
@@ -1691,125 +1785,6 @@ const makeRT = (w, h) => new THREE.WebGLRenderTarget(w, h, {
   minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture(w, h),
 });
 
-/* ---------- céu em pixel art do 3D cru ---------- */
-// Lua, estrelas, nuvens, morros e castelo no mesmo estilo do clássico. É um canvas de baixa resolução
-// atrás do 3D (o fundo do 3D é transparente nesse modo), redesenhado 12 vezes por segundo.
-const sky = (() => {
-  const cv = $('sky'), g = cv.getContext('2d'), SH = 270;
-  const GRAD = ['#07051a', '#0c0922', '#120d2b', '#191235', '#21183f', '#2a1c4a'];
-  let w = 0, base = null, fog = null, acc = 1, time = 0, batT = 4, shootT = 6, shoot = null;
-  const stars = [], clouds = [], bats = [];
-  const dot = (c, x, y, col, a = 1, b = 1) => { c.fillStyle = col; c.fillRect(Math.round(x), Math.round(y), a, b); };
-  function makeCloud(cw, ch, seed) {
-    const c = document.createElement('canvas'); c.width = cw; c.height = ch;
-    const x = c.getContext('2d'), rnd = mulberry32(seed), blobs = [];
-    for (let i = 0; i < 7; i++) blobs.push([cw * (0.12 + rnd() * 0.76), ch * (0.45 + rnd() * 0.3), ch * (0.28 + rnd() * 0.3)]);
-    const inside = (a, b) => blobs.some(([bx, by, r]) => Math.hypot((a - bx) * 0.6, b - by) < r);
-    for (let b = 0; b < ch; b++) for (let a = 0; a < cw; a++) if (inside(a, b)) dot(x, a, b, inside(a, b - 1) ? '#241c40' : '#3a2e5c');
-    return c;
-  }
-  function makeFog() {
-    const FW = 512, c = document.createElement('canvas'); c.width = FW; c.height = 70;
-    const x = c.getContext('2d'), rnd = mulberry32(99), blobs = [];
-    for (let i = 0; i < 22; i++) blobs.push([rnd() * FW, 26 + rnd() * 34, 16 + rnd() * 24]);
-    for (let b = 0; b < 70; b++) for (let a = 0; a < FW; a++) {
-      let v = 0;
-      for (const [bx, by, r] of blobs) { let dx = Math.abs(a - bx); dx = Math.min(dx, FW - dx); v = Math.max(v, 1 - Math.hypot(dx * 0.5, b - by) / r); }
-      if (v * 0.85 > bayer(a, b)) dot(x, a, b, '#6a62a8');
-    }
-    return c;
-  }
-  function build() {
-    const rnd = mulberry32(2024), c = document.createElement('canvas'); c.width = w; c.height = SH;
-    const b = c.getContext('2d');
-    // degradê pontilhado
-    for (let y = 0; y < SH; y++) {
-      const k = Math.min(1, y / (SH * 0.86)) * (GRAD.length - 1), i = Math.min(GRAD.length - 2, Math.floor(k)), f = k - i;
-      for (let x = 0; x < w; x++) dot(b, x, y, f > bayer(x, y) ? GRAD[i + 1] : GRAD[i]);
-    }
-    // lua com halo pontilhado e crateras
-    const mx = Math.round(w * 0.6), my = 58, mr = Math.round(clamp(w * 0.09, 12, 23));
-    for (let y = my - 54; y <= my + 54; y++) for (let x = mx - 54; x <= mx + 54; x++) {
-      const d = Math.hypot(x - mx, y - my);
-      if (d > mr && d < mr + 30 && (1 - (d - mr) / 30) * 0.6 > bayer(x, y)) dot(b, x, y, d < mr + 12 ? '#3a2f66' : '#2a2350');
-    }
-    const craters = [[-7, -5, 5], [7, 5, 4.2], [-2, 11, 3], [11, -9, 2.8], [-13, 7, 2.3]].map((c) => c.map((v) => (v * mr) / 23));
-    for (let y = my - mr; y <= my + mr; y++) for (let x = mx - mr; x <= mx + mr; x++) {
-      const d = Math.hypot(x - mx, y - my);
-      if (d > mr) continue;
-      let col = '#f5e6a8';
-      if (craters.some(([cx, cy, r]) => Math.hypot(x - mx - cx, y - my - cy) <= r)) col = '#d9c47e';
-      if (d > mr - 3) col = '#e2cf88';
-      if ((x - mx) + (y - my) < -mr * 0.95 && d > mr - 7) col = '#fff8d8';
-      if ((x - mx) + (y - my) > mr * 0.9 && d > mr - 6) col = '#cbb46e';
-      dot(b, x, y, col);
-    }
-    // morros ao longe com castelo e cruzes
-    const far = (x) => Math.round(SH - 74 - (6 * Math.sin(x * 0.021) + 5 * Math.sin(x * 0.055 + 1.3) + 3 * Math.sin(x * 0.13 + 0.4)));
-    for (let x = 0; x < w; x++) dot(b, x, far(x), '#191430', 1, SH - far(x));
-    const cx = Math.round(w * 0.16), top = far(cx + 12);
-    [[0, -14, 5, 16], [6, -9, 12, 11], [19, -17, 5, 19], [9, -12, 3, 3], [14, -12, 3, 3]].forEach(([x, y, a, h]) => dot(b, cx + x, top + y, '#120e24', a, h));
-    [[1, -15], [3, -15], [20, -18], [22, -18]].forEach(([x, y]) => dot(b, cx + x, top + y, '#120e24'));
-    [[2, -10], [21, -13], [11, -6]].forEach(([x, y]) => dot(b, cx + x, top + y, '#ffd23f', 1, 2));
-    const near = (x) => Math.round(SH - 56 - (5 * Math.sin(x * 0.033 + 2) + 3 * Math.sin(x * 0.09 + 0.7)));
-    for (let x = 0; x < w; x++) dot(b, x, near(x), '#15112a', 1, SH - near(x));
-    for (const f of [0.08, 0.3, 0.46, 0.78, 0.9]) {
-      const x = Math.round(w * f), y = near(x) - 7;
-      dot(b, x, y, '#2a2147', 1, 8); dot(b, x - 2, y + 2, '#2a2147', 5, 1);
-    }
-    base = c;
-    // estrelas (as que cairiam em cima da lua ficam de fora)
-    stars.length = 0;
-    for (let i = 0; i < (w * SH) / 520; i++) {
-      const x = rnd() * w | 0, y = Math.pow(rnd(), 1.5) * SH * 0.62 | 0;
-      if (Math.hypot(x - mx, y - my) > mr + 3) stars.push({ x, y, p: rnd() * 6.28, sp: 0.8 + rnd() * 1.6, big: rnd() < 0.18 });
-    }
-    clouds.length = 0;
-    for (let i = 0; i < Math.ceil(w / 80); i++) {
-      const c2 = makeCloud(36 + (rnd() * 64 | 0), 10 + (rnd() * 12 | 0), 11 + i);
-      clouds.push({ c: c2, x: rnd() * (w + 80) - 40, y: 18 + (rnd() * 130 | 0), v: 1.2 + rnd() * 2.4 });
-    }
-  }
-  function resize() {
-    const nw = Math.ceil((SH * window.innerWidth) / Math.max(1, window.innerHeight));
-    if (nw === w) return;
-    w = nw; cv.width = w; cv.height = SH;
-    if (!fog) fog = makeFog();
-    build();
-    acc = 1;
-  }
-  function frame(dt) {
-    time += dt; acc += dt;
-    for (const c of clouds) { c.x += c.v * dt; if (c.x > w + 8) c.x = -c.c.width - 8; }
-    for (let i = bats.length - 1; i >= 0; i--) { const b = bats[i]; b.x += b.v * dt; b.p += dt; if (b.x < -20 || b.x > w + 20) bats.splice(i, 1); }
-    batT -= dt;
-    if (batT <= 0) {
-      batT = mr(5, 12);
-      const dir = Math.random() < 0.5 ? 1 : -1, n = 2 + Math.floor(Math.random() * 3), y = mr(30, 120);
-      for (let i = 0; i < n; i++) bats.push({ x: dir > 0 ? -10 - i * 11 : w + 10 + i * 11, y: y + mr(-8, 8), v: dir * mr(16, 26), p: mr(0, 3) });
-    }
-    shootT -= dt;
-    if (shootT <= 0) { shootT = mr(7, 16); shoot = { x: mr(w * 0.1, w * 0.8), y: mr(8, 60), t: 0 }; }
-    if (shoot) { shoot.t += dt; if (shoot.t > 0.7) shoot = null; }
-    if (acc < 1 / 12) return;
-    acc = 0;
-    g.drawImage(base, 0, 0);
-    for (const s of stars) {
-      const v = Math.sin(time * s.sp + s.p);
-      if (v < -0.35) continue;
-      dot(g, s.x, s.y, v > 0.45 ? '#fff6cc' : '#6e66a8');
-      if (s.big && v > 0.8) { dot(g, s.x - 1, s.y, '#8a80c0'); dot(g, s.x + 1, s.y, '#8a80c0'); dot(g, s.x, s.y - 1, '#8a80c0'); dot(g, s.x, s.y + 1, '#8a80c0'); }
-    }
-    if (shoot) for (let i = 0; i < 9; i++) dot(g, shoot.x + shoot.t * 170 - i * 2, shoot.y + shoot.t * 70 - i, i < 3 ? '#fff6cc' : '#6e66a8');
-    for (const c of clouds) g.drawImage(c.c, Math.round(c.x), c.y);
-    for (const b of bats) g.drawImage(getSprite(Math.floor(b.p * 8) % 2 ? 'bat1' : 'bat2'), Math.round(b.x), Math.round(b.y));
-    g.globalAlpha = 0.16;
-    const off = (time * 3) % 512;
-    for (let x = -off; x < w; x += 512) g.drawImage(fog, Math.round(x), SH - 66);
-    g.globalAlpha = 1;
-  }
-  return { resize, frame };
-})();
 
 /* ---------- view & sizing ---------- */
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1817,6 +1792,8 @@ const view = { yaw: Math.PI / 4, yawT: Math.PI / 4, pitch: 0.6, pitchT: 0.6, zoo
 const MODE_KEY = 'casaAssombrada.3d.modo';
 const settings = { pixel: (() => { try { return localStorage.getItem(MODE_KEY) === 'pixel'; } catch (e) { return false; } })(), px: 3, names: true };
 let cssW = 1, cssH = 1, canW = 1, canH = 1;
+// CIN = visual realista, primeira pessoa e som (js/cinema3d.js); HUD = menu, doca e tutorial (js/hud3d.js)
+let CIN = null, HUD = null;
 function resize() {
   cssW = window.innerWidth; cssH = window.innerHeight;
   const dpr = window.devicePixelRatio || 1;
@@ -1832,13 +1809,13 @@ function resize() {
     compU.tNormal.value = rtNormal.texture; compU.tDepthN.value = rtNormal.depthTexture;
     compU.uRes.value.set(lowW, lowH);
   } else {
-    const pr = Math.min(dpr, 2);
+    const pr = Math.min(dpr, CIN.maxRatio);
     renderer.setPixelRatio(pr); renderer.setSize(cssW, cssH, false);
     canW = cssW; canH = cssH;
     canvas.style.imageRendering = 'auto';
+    CIN.resize(cssW, cssH, pr);
   }
   canvas.style.width = canW + 'px'; canvas.style.height = canH + 'px';
-  sky.resize();
 }
 function updateCamera(dt) {
   const k = reduceMotion ? 1 : Math.min(1, dt * 7);
@@ -1854,7 +1831,7 @@ function updateCamera(dt) {
   const visW = desk ? cssW - 340 : cssW, visH = desk ? cssH : cssH - 150;
   // no celular a ilha ocupa a largura toda e desce para o vão entre a placa e o painel
   const baseFit = Math.max((23 * cssH) / visH, ((desk ? 28.5 : 24.5) * cssH) / Math.max(visW, 240));
-  const fit = PLAN.length ? Math.max(baseFit, ((mapView.halfV * 0.6 + 10) * cssH) / visH, ((mapView.halfU + 8) * cssH) / Math.max(visW, 240)) : baseFit;
+  const fit = PLAN.length ? Math.max(baseFit, ((mapView.halfV * 0.6 + 13) * cssH) / visH, ((mapView.halfU + 8) * cssH) / Math.max(visW, 240)) : baseFit;
   const hh = fit / view.zoom;
   const hw = (hh * canW) / canH;
   const sx = desk ? (166 / canW) * 2 * hw : 0;
@@ -1907,9 +1884,34 @@ function updateHUD() {
   if (selected && selected.mon) $('cCount').textContent = selected.mon.count.toLocaleString('pt-BR');
 }
 function updateMintUI() {
-  const free = slots.filter((s) => !s.mon && !s.minting).length;
-  $('mintBtn').disabled = free === 0;
-  $('mintNote').textContent = free ? `Grátis · ${free} ${free > 1 ? 'vagas' : 'vaga'}` : 'Vagas cheias';
+  const inv = Game.s.monsters.filter((r) => r.slot < 0).length;
+  $('mintNote').textContent = inv ? `Grátis · ${inv} no inventário` : 'Grátis';
+  renderInv();
+}
+// inventário de bonecos: o que foi mintado e ainda não está em nenhuma vaga, agrupado por personagem
+function invGroups() {
+  const by = {};
+  for (const r of Game.s.monsters) if (r.slot < 0) (by[r.kind] = by[r.kind] || []).push(r);
+  return Object.values(by).sort((a, b) => RAR[b[0].rarity].index - RAR[a[0].rarity].index || MON[a[0].kind].name.localeCompare(MON[b[0].kind].name));
+}
+function invRow(g, slotI) {
+  const r = g[0], rar = RAR[r.rarity];
+  return `<div class="pick">${sprHtml(r.kind, 2)}<div><b>${escHtml(MON[r.kind].name)}</b>${g.length > 1 ? ` x${g.length}` : ''}<br><span style="color:${rar.color}">${rar.label}</span></div><button class="btn sm" data-act="monplace" data-id="${r.id}"${slotI === undefined ? '' : ` data-slot="${slotI}"`}>COLOCAR</button></div>`;
+}
+let invHtml = '';
+function renderInv() {
+  const groups = invGroups(), n = groups.reduce((a, g) => a + g.length, 0);
+  const html = `<h2>INVENTÁRIO${n ? ' · ' + n : ''}</h2>` + (groups.length ? `<div class="pick-list inv-list">${groups.map((g) => invRow(g)).join('')}</div>` : '<p class="note">Vazio. Abra o caixão para mintar um boneco.</p>');
+  if (html === invHtml) return;
+  invHtml = html;
+  $('invList').innerHTML = html;
+  hydrate($('invList'));
+}
+// clique numa vaga vazia: escolhe qual boneco do inventário vai para ela
+function pickForSlot(slot) {
+  const groups = invGroups();
+  if (!groups.length) { toast('Inventário vazio. Abra o caixão de BONECOS para mintar.'); return; }
+  openModal(`<h3>COLOCAR NA VAGA ${Game.slotOrder.indexOf(slot.i) + 1}</h3><div class="pick-list">${groups.map((g) => invRow(g, slot.i)).join('')}</div>`);
 }
 function updateRoster() {
   const list = onTrack();
@@ -1974,7 +1976,7 @@ function removeMonster(slot) {
   scene.remove(m.g); dropSprite(m.label);
   if (m.buff) dropSprite(m.buff);
   if (m.bat) dropSprite(m.bat);
-  Game.s.monsters.splice(Game.s.monsters.indexOf(m.rec), 1);
+  m.rec.slot = -1;   // volta para o inventário
   slot.mon = null;
   slot.ringMat.color.set('#3a2d5c');
   if (selected === slot) closeCard();
@@ -1991,17 +1993,103 @@ function scareAnim(slot) {
   for (let i = 0; i < 6; i++) emit(slot.x - slot.nx * 0.6, mr(1.2, 2.4), slot.z - slot.nz * 0.6, -slot.nx * mr(0.5, 1.4), mr(0.2, 0.8), -slot.nz * mr(0.5, 1.4), mr(0.5, 0.8), mr(0.12, 0.2), COL.bat, 0);
 }
 // mintar: a cripta brilha, um raio vai até a vaga e o boneco sobe do chão
-function mint(target) {
-  const free = slots.filter((s) => !s.mon && !s.minting);
-  if (!free.length) { toast('Todas as vagas estão ocupadas.', 'bad'); return; }
-  const slot = target && !target.mon && !target.minting ? target : free[Math.floor(Math.random() * free.length)];
-  const rarity = Game.rollRarity();
-  const kinds = RAR[rarity].kinds;
-  const kind = kinds[Math.floor(Math.random() * kinds.length)].key;
-  slot.minting = { t: 0, kind };
+// mintar: sorteia o boneco, mostra a revelação e guarda no inventário. Ele só vai para a pista quando o
+// jogador escolhe uma vaga, e aí sim sai voando da cripta
+function mint() {
+  if (reveal && !reveal.opened) return;
+  const rarity = Game.rollRarity(), kinds = RAR[rarity].kinds;
+  const rec = { id: Game.s.nextId++, rarity, kind: kinds[Math.floor(Math.random() * kinds.length)].key, level: 1, slot: -1 };
+  Game.s.monsters.push(rec);
+  cryptFlash = 1.2;
+  startReveal({ rec });
+  updateMintUI();
+  Game.save();
+}
+function flyIn(rec, target) {
+  const slot = target && !target.mon && !target.minting ? target : Game.slotOrder.map((i) => slots[i]).find((s) => !s.mon && !s.minting);
+  if (!slot) { toast('Todas as vagas estão ocupadas. Tire um boneco da pista ou compre uma ilha.', 'bad'); return false; }
+  rec.slot = slot.i;
+  slot.minting = { t: 0, kind: rec.kind, rec };
   cryptFlash = 1.2;
   updateMintUI();
+  return true;
 }
+
+/* ---------- revelação do mint ---------- */
+// A caixa (caixão dos bonecos ou baú dos itens) dá uns pulos, abre num clarão e o que saiu aparece
+// girando em 3D, no mesmo modelo do cartão. Serve para { rec } (boneco) e para { item } (chave do item).
+let reveal = null;
+const rvParts = [];
+function startReveal({ rec, item }) {
+  closeCard();
+  const rar = rec && RAR[rec.rarity], it = item && LAB_ITEMS[item];
+  reveal = { rec, item, t: 0, opened: false, color: rec ? rar.color : '#ffd23f', box: rec ? 'coffin' : 'lab_chest', model: rec ? rec.kind : Lab.lookSprite(item) };
+  rvParts.length = 0;
+  $('reveal').hidden = false;
+  $('revealTxt').classList.remove('show');
+  $('rvRar').textContent = rec ? rar.label.toUpperCase() : 'ITEM'; $('rvRar').style.color = reveal.color;
+  $('rvName').textContent = rec ? MON[rec.kind].name : it.name;
+  $('rvInfo').textContent = rec
+    ? `Rende ${fmtN(rar.farm, 0)} $MEDO por dia · chance de infarto ${pct(rar.heart)}`
+    : `${LabUI.itemEffect({ farm: it.farm * LAB_ITEM_POWER, heart: Math.max(0.2, 1 - (1 - it.heart) * LAB_ITEM_POWER) })} · vale para os bonecos da ilha onde for equipado`;
+  $('rvPlace').textContent = rec ? 'COLOCAR NA PISTA' : 'EQUIPAR NA ABA ITENS';
+  $('rvPlace').disabled = rec ? !slots.some((s) => !s.mon && !s.minting) : false;
+  $('rvAgain').textContent = rec ? 'MINTAR OUTRO' : 'ABRIR OUTRO';
+  if (vitrine) vitrine.show(reveal.model, rec ? undefined : reveal.color);
+}
+function closeReveal() { reveal = null; $('reveal').hidden = true; }
+function updateReveal(dt) {
+  if (!reveal) return;
+  const x = $('revealCv').getContext('2d'), S = 260, MID = S / 2, FLOOR = 212, OPEN = 1.15;
+  const rar = { color: reveal.color }, t = (reveal.t += dt);
+  const glow = (r, col, a) => {
+    const g = x.createRadialGradient(MID, FLOOR - 70, 0, MID, FLOOR - 70, r);
+    g.addColorStop(0, col + a); g.addColorStop(1, col + '00');
+    x.fillStyle = g; x.fillRect(0, 0, S, S);
+  };
+  x.imageSmoothingEnabled = false;
+  x.clearRect(0, 0, S, S);
+  if (t < OPEN) {
+    // o caixão pula cada vez mais alto e treme antes de abrir
+    const k = t / OPEN, lift = Math.abs(Math.sin(t * 8.5)) * 14 * k, coffin = getSprite(reveal.box);
+    glow(50 + k * 80, '#fff1c2', k > 0.5 ? '66' : '33');
+    x.fillStyle = 'rgba(0,0,0,0.4)';
+    x.beginPath(); x.ellipse(MID, FLOOR + 4, 40 - lift, 7, 0, 0, Math.PI * 2); x.fill();
+    x.save(); x.translate(MID, FLOOR - lift); x.rotate(Math.sin(t * 26) * 0.07 * k);
+    x.drawImage(coffin, -56, -112, 112, 112);
+    x.restore();
+  } else {
+    const u = t - OPEN;
+    if (!reveal.opened) {
+      reveal.opened = true;
+      $('revealTxt').classList.add('show');
+      for (let i = 0; i < 36; i++) { const a = mr(0, 6.28), v = mr(70, 200); rvParts.push({ x: MID, y: FLOOR - 70, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 50, l: mr(0.6, 1.2), s: mr(3, 7), c: i % 3 ? rar.color : '#ffffff' }); }
+      CIN.audio.coin();
+    }
+    // raios girando na cor da raridade
+    x.save(); x.translate(MID, FLOOR - 70); x.rotate(t * 0.4);
+    x.fillStyle = rar.color + '2e';
+    for (let i = 0; i < 12; i++) { x.rotate(Math.PI / 6); x.beginPath(); x.moveTo(0, 0); x.lineTo(170, -18); x.lineTo(170, 18); x.closePath(); x.fill(); }
+    x.restore();
+    glow(120, rar.color, '55');
+    // o boneco salta para fora: estica, amassa e assenta
+    const pop = u < 0.16 ? lerp(0.3, 1.18, u / 0.16) : u < 0.36 ? lerp(1.18, 0.94, (u - 0.16) / 0.2) : u < 0.5 ? lerp(0.94, 1, (u - 0.36) / 0.14) : 1, w = 210 * pop;
+    if (vitrine) { vitrine.frame(dt); x.drawImage($('cView'), MID - w / 2, FLOOR + 14 - w, w, w); }
+    else { const sp = getSprite(reveal.model), h = (w * sp.height) / sp.width; x.drawImage(sp, MID - w / 4, FLOOR - h / 2, w / 2, h / 2); }
+    if (u < 0.3) { x.fillStyle = `rgba(255,255,255,${(0.85 * (1 - u / 0.3)).toFixed(2)})`; x.fillRect(0, 0, S, S); }
+  }
+  for (let i = rvParts.length - 1; i >= 0; i--) {
+    const p = rvParts[i];
+    p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 260 * dt; p.l -= dt;
+    if (p.l <= 0) { rvParts.splice(i, 1); continue; }
+    x.globalAlpha = Math.min(1, p.l * 2); x.fillStyle = p.c; x.fillRect(Math.round(p.x), Math.round(p.y), p.s, p.s);
+  }
+  x.globalAlpha = 1;
+}
+$('rvPlace').addEventListener('click', () => { const rec = reveal && reveal.rec; closeReveal(); if (rec) flyIn(rec); else setTab('items'); });
+$('rvAgain').addEventListener('click', () => { const item = reveal && reveal.item; closeReveal(); if (item) openItemBox(); else mint(); });
+$('rvClose').addEventListener('click', closeReveal);
+$('reveal').addEventListener('click', (e) => { if (e.target.id === 'reveal' && reveal && reveal.opened) closeReveal(); });
 function updateMinting(dt) {
   for (const s of slots) {
     const m = s.minting;
@@ -2013,12 +2101,12 @@ function updateMinting(dt) {
     if (m.t >= 0.9) {
       s.minting = null;
       burst(s.x, 0.8, s.z, col, 26, 2.4, 0.18);
-      placeMonster(s, m.kind);
+      placeMonster(s, m.kind, false, m.rec);
       const rar = RAR[MON[m.kind].rarity];
       floatText(rar.label, rar.color, s.x, 3.6, s.z, { life: 1.8, vy: 0.6 });
       selectSlot(s, false);
-      $('cNew').hidden = false;
       updateHUD();
+      Game.save();
     }
   }
 }
@@ -2041,7 +2129,7 @@ function updateMonsters(dt, dtReal) {
       if (m.scareT <= 0) { m.body.visible = true; m.scared.visible = false; }
     }
     // fica de frente para a câmera; no susto vira para o trilho
-    const want = m.scareT > 0 ? Math.atan2(-s.nx, -s.nz) : view.yaw;
+    const want = m.scareT > 0 ? Math.atan2(-s.nx, -s.nz) : CIN.faceYaw(s);
     let da = want - m.face; da = Math.atan2(Math.sin(da), Math.cos(da));
     m.face += da * Math.min(1, dtReal * 10);
     // giro manual (arrastando o boneco): fica uns segundos e depois volta a olhar para a câmera
@@ -2088,6 +2176,8 @@ function scarePass(slot, cart, cartIndex) {
     if (Math.random() < Lab.heartOf(rec) * Lab.cartHeart(cartIndex) * econ.mult) heartAttack(seat, rec, hit++);
   }
   scareAnim(slot);
+  // no passeio em primeira pessoa, o ganho do seu carrinho aparece na HUD em vez de na sua cara
+  if (CIN.onScare(slot, cart, cartIndex, gain)) return;
   const p = cart.g.position;
   floatText('+' + fmtN(gain, 3), '#ffd23f', p.x, 1.3, p.z, { life: 1.1, vy: 0.9 });
 }
@@ -2154,6 +2244,7 @@ function payTrain() {
   train.carry = 0;
   if (v <= 0) return;
   Game.earn(v);
+  CIN.onPay(v);
   floatText('+' + fmtN(v, 3) + ' $MEDO', '#ffd23f', 7.6, 5.4, -11, { life: 2.4, vy: 0.7 });
   burst(7.6, 2.4, -11, COL.zap, 22, 2.2, 0.15);
   const bal = $('medo');
@@ -2297,7 +2388,7 @@ const vitrine = (() => {
   const rb = new Builder(); rb.box(0, -0.36, 0, 2.7, 0.1, 2.7, '#ffffff', 0, 0);
   sc.add(rb.mesh(ringMat, { cast: false }));
   let body = null, scared = null, yaw = 0.6, tilt = 0, drag = null, idle = 0, scareT = 0;
-  function show(kind) {
+  function show(kind, color) {
     holder.clear();
     const jelly = kind === 'geleca';
     body = jelly ? makeGeleca(false) : new THREE.Mesh(voxelGeo(kind), matMon);
@@ -2308,7 +2399,7 @@ const vitrine = (() => {
     const half = (Math.max(hgt + 0.7, bb.max.x - bb.min.x, 2.8) / 2) * 1.12, cy = (bb.max.y - 0.4) / 2;
     Object.assign(cm, { left: -half, right: half, top: half, bottom: -half });
     cm.position.set(0, cy + 6, 14); cm.lookAt(0, cy, 0); cm.updateProjectionMatrix();
-    const col = RAR[MON[kind].rarity].color;
+    const col = color || RAR[MON[kind].rarity].color;
     ringMat.color.set(col); rim.color.set(col);
     yaw = 0.6; tilt = 0; scareT = 0; idle = 0;
   }
@@ -2388,7 +2479,7 @@ function onPick(kind, ref, pt) {
       floatText('CARREGADO!', '#5ee07a', ref.x, 3.4, ref.z, { life: 1.2 });
       burst(ref.x, 1.4, ref.z, COL.zap, 14, 1.6, 0.12);
     } else if (ref.mon) selectSlot(ref, true);
-    else if (!ref.minting) mint(ref);
+    else if (!ref.minting) pickForSlot(ref);
   } else if (kind === 'crypt') {
     mint();
   } else if (kind === 'bat') {
@@ -2497,7 +2588,7 @@ function setPaused(p) {
 function setPixel(on) {
   settings.pixel = on;
   try { localStorage.setItem(MODE_KEY, on ? 'pixel' : 'cru'); } catch (e) { /* sem storage */ }
-  $('sky').hidden = on;
+  CIN.setLook(on);
   $('modePixel').setAttribute('aria-pressed', String(on));
   $('modeRaw').setAttribute('aria-pressed', String(!on));
   $('px').disabled = !on;
@@ -2572,6 +2663,11 @@ window.World = {
   },
   labAct(a, d) {
     const st = Lab.st(), inv = Lab.items();
+    if (a === 'monplace') {
+      const rec = Game.s.monsters.find((r) => r.id === +d.id && r.slot < 0);
+      if (rec && flyIn(rec, d.slot === undefined ? null : slots[+d.slot])) closeModal();
+      return true;
+    }
     if (a === 'labturbo') { if (turboOwned() < LAB_TURBO.max && Game.spend(LAB_TURBO.cost)) { st.turbo = (st.turbo || 0) + 1; Lab.afterFix(); } return true; }
     if (a === 'labturbodown') { st.turbo = Math.max(0, (st.turbo || 0) - 1); Lab.afterFix(); return true; }
     if (a === 'itemisle') { itemIsle = +d.i; renderItems(true); return true; }
@@ -2648,21 +2744,14 @@ function setTab(t) {
   if (t === 'items') renderItems(true);
   if (t === 'park') renderPark();
 }
-// caixinhas de mint: a caixa treme ao abrir; a de itens mostra por um instante o que saiu
+// caixinhas de mint: a caixa treme ao abrir e o que saiu aparece na revelação
 function popBox(el) { el.classList.remove('open'); void el.offsetWidth; el.classList.add('open'); }
-let itemBoxTimer = 0;
 function openItemBox() {
-  if (!Game.spend(LAB_ITEM_MINT)) return;
+  if ((reveal && !reveal.opened) || !Game.spend(LAB_ITEM_MINT)) return;
   const inv = Lab.items(), keys = Object.keys(LAB_ITEMS), key = keys[Math.floor(Math.random() * keys.length)];
   inv.inv[key] = (inv.inv[key] || 0) + 1;
-  const box = $('itemBox'), art = $('itemBoxArt');
-  popBox(box);
-  art.dataset.spr = Lab.lookSprite(key);
-  hydrate(box);
-  $('itemBoxName').textContent = 'SAIU!';
-  clearTimeout(itemBoxTimer);
-  itemBoxTimer = setTimeout(() => { art.dataset.spr = 'lab_chest'; hydrate(box); $('itemBoxName').textContent = 'ITENS'; }, 1600);
-  toast('Saiu da caixa: ' + LAB_ITEMS[key].name + '!', 'good');
+  popBox($('itemBox'));
+  startReveal({ item: key });
   updateHUD();
   Lab.afterFix();
 }
@@ -2731,6 +2820,7 @@ LabUI.bind({
 const labClick = (e) => { const b = e.target.closest('[data-act]'); if (b && !b.disabled) LabUI.act(b.dataset.act, b.dataset); };
 $('labPanel').addEventListener('click', labClick);
 $('itemsPanel').addEventListener('click', labClick);
+$('invList').addEventListener('click', labClick);
 $('parkExpand').addEventListener('click', labClick);
 $('cLab').addEventListener('click', labClick);
 $('labModal').addEventListener('click', (e) => {
@@ -2999,9 +3089,7 @@ function render() {
     renderer.setRenderTarget(rtNormal); renderer.setClearColor(0x8080ff, 1); renderer.render(scene, cam);
     scene.overrideMaterial = null;
     renderer.setRenderTarget(null); renderer.setClearColor(0x000000, 0); renderer.render(compScene, compCam);
-  } else {
-    renderer.setRenderTarget(null); renderer.setClearColor(0x000000, 0); renderer.render(scene, cam);
-  }
+  } else CIN.render();
 }
 
 let last = performance.now();
@@ -3015,6 +3103,7 @@ function step(dtReal) {
   Lab.update(dt);
   updateWorld(dt);
   updateLights(dt);
+  CIN.afterLights();
   updateTrain(dt);
   updateRiders(dt);
   updateMinting(dt);
@@ -3026,17 +3115,30 @@ function step(dtReal) {
   updateParts(dt);
   updateDrops(dt);
   updateCamera(dtReal);
-  if (!settings.pixel) sky.frame(dtReal);
+  CIN.update(dt, dtReal);
+  HUD.update(dtReal);
   sizeSprites();
   if (vitrine && !$('card').hidden) vitrine.frame(dtReal);
+  updateReveal(dtReal);
   hudT -= dtReal;
   if (hudT <= 0) { hudT = 0.25; updateHUD(); syncLinks(); syncBuffLabels(); linkMotes(); }
   render();
 }
 
+CIN = initCinema3D(THREE, { EffectComposer, RenderPass, UnrealBloomPass, ShaderPass, OutputPass, FXAAShader }, {
+  renderer, scene, cam, view, settings, state, U, MAP_S, mapMid, RX, RZ, LAP, carts, train, slots, lapPt, OFFS, fmtN,
+  moon, hemi, lampLights, LANTERNS, headlight, houseLight, porchLight, cryptLight,
+  lampMat, winWarm, winPurple, runeMat, eyeMat, medLampMat, doorGlow, padMat, mist, matMist,
+  floaters, setPixel, setPaused, closeCard, resize,
+});
+
 // abertura: na primeira vez, um boneco clássico de cada raridade; depois, o parque salvo
 if (firstRun) [[0, 'ghost'], [1, 'zombie'], [2, 'geleca'], [3, 'wolf'], [5, 'vamp'], [6, 'reaper']].forEach(([i, k]) => placeMonster(slots[i], k, true));
-else for (const rec of Game.s.monsters) if (rec.slot >= 0 && rec.slot < slots.length && !slots[rec.slot].mon) placeMonster(slots[rec.slot], rec.kind, true, rec);
+else for (const rec of Game.s.monsters) {
+  if (rec.slot < 0) continue;
+  // boneco de uma vaga que não existe mais (ilha desfeita) volta para o inventário
+  if (rec.slot < slots.length && !slots[rec.slot].mon) placeMonster(slots[rec.slot], rec.kind, true, rec); else rec.slot = -1;
+}
 if (window.innerWidth < 760) { settings.px = 2; $('px').value = '2'; $('pxOut').textContent = '2'; }
 setPixel(settings.pixel);
 setMult(econ.mult);
@@ -3059,10 +3161,11 @@ if (econ.medics) { medicGroup.visible = true; setMedics(true); }
   } catch (e) { /* sem storage */ }
 }
 updateHUD();
+HUD = initHud3D({ Game, CIN, view, state, settings, carts, slots, MAP_S, setPaused, setPixel, setTab, hydrate });
 setInterval(() => Game.save(), 5000);
 setInterval(() => { if (tab3d === 'lab') renderLab(); }, 1000);
 window.addEventListener('beforeunload', () => Game.save());
-window.__parque = { econ, slots, train, mint, setMedics, setMult, step, estimate, view, cam, bats, souls, carts, LOTS, GSPOTS, PROP, TRACK, MAP_S, onPick };
+window.__parque = { econ, slots, train, mint, setMedics, setMult, step, estimate, view, cam, bats, souls, carts, LOTS, GSPOTS, PROP, TRACK, MAP_S, onPick, CIN, HUD };
 requestAnimationFrame(frame);
 </script>
 </body>
