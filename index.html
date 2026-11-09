@@ -166,6 +166,37 @@
   .item-slot.full { border-style: solid; border-color: var(--gold); cursor: pointer; }
   .item-slot.locked { opacity: 0.35; }
 
+  /* caixinhas de mint */
+  .boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mbox {
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px 8px; cursor: pointer;
+    font: inherit; color: var(--text); background: radial-gradient(circle at 50% 35%, #33245a, #1a1330 72%); border: 2px solid var(--line); border-radius: 4px;
+  }
+  .mbox.items { background: radial-gradient(circle at 50% 35%, #4a2a1a, #1f1420 72%); }
+  .mbox canvas { display: block; image-rendering: pixelated; }
+  .mbox b { font-family: var(--pixel); font-size: 9px; font-weight: 400; color: var(--gold); text-align: center; line-height: 1.3; }
+  .mbox small { font-size: 16px; line-height: 1; color: var(--muted); }
+  .mbox:hover:not(:disabled) { border-color: var(--gold); }
+  .mbox:hover:not(:disabled) canvas { animation: boxbob 0.45s steps(3) infinite alternate; }
+  .mbox:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .mbox:disabled { opacity: 0.5; cursor: default; }
+  .mbox.open canvas { animation: boxshake 0.45s steps(6); }
+  @keyframes boxbob { to { transform: translateY(-4px); } }
+  @keyframes boxshake {
+    0%, 100% { transform: none; } 20% { transform: translateX(-3px) rotate(-6deg); } 40% { transform: translateX(3px) rotate(6deg); }
+    60% { transform: translateX(-2px) rotate(-4deg); } 80% { transform: translateX(2px) rotate(4deg); }
+  }
+  /* expandir o parque */
+  #expandBtn { position: fixed; right: max(332px, calc(env(safe-area-inset-right, 0px) + 332px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: auto; white-space: nowrap; }
+  #expandBtn[hidden] { display: none; }
+  .isle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .isle-cell { min-height: 38px; display: grid; place-items: center; text-align: center; padding: 2px; font-family: var(--pixel); font-size: 6px; line-height: 1.4; color: var(--muted); background: #0d0a17; border: 2px solid #2a2045; }
+  .isle-cell.main { color: var(--orange); border-color: var(--orange); }
+  .isle-cell.next { color: var(--gold); border-color: var(--gold); }
+  .isle-cell.comum { color: #b9bdd0; border-color: #b9bdd0; }
+  .isle-cell.rara { color: #4aa3ff; border-color: #4aa3ff; }
+  .isle-cell.lendaria { color: #ffb52e; border-color: #ffb52e; }
+
   /* aba TESTE (conteúdo gerado por js/lab.js) */
   #labBody { padding-top: 12px; gap: 10px; }
   .labroot h3 { font-family: var(--pixel); font-weight: 400; font-size: 11px; color: var(--gold); margin: 0 0 8px; }
@@ -217,6 +248,7 @@
   .lab-sum { font-size: 17px; line-height: 1.15; }
 
   @media (max-width: 760px) {
+    #expandBtn { right: max(16px, env(safe-area-inset-right, 0px)); top: calc(88px + env(safe-area-inset-top, 0px)); bottom: auto; }
     .panel:not(.open) .p-tabs { display: none; }
     .sign { right: max(16px, env(safe-area-inset-right, 0px)); max-width: none; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .sign h1 { font-size: 13px; margin: 4px 0 0; }
@@ -273,9 +305,10 @@
   </nav>
   <div class="p-body" id="monsBody">
     <section class="sec">
-      <h2>CRIPTA DE INVOCAÇÃO</h2>
-      <button class="btn primary" id="mintBtn">MINTAR BONECO</button>
-      <p class="note" id="mintNote"></p>
+      <div class="boxes">
+        <button class="mbox" id="mintBtn"><canvas class="spr" data-spr="coffin" data-scale="4"></canvas><b>BONECOS</b><small id="mintNote"></small></button>
+        <button class="mbox items" id="itemBox"><canvas class="spr" id="itemBoxArt" data-spr="lab_chest" data-scale="4"></canvas><b id="itemBoxName">ITENS</b><small id="itemBoxPrice"></small></button>
+      </div>
     </section>
     <section class="sec">
       <h2>NA PISTA</h2>
@@ -288,6 +321,7 @@
     <div id="labPanel"></div>
   </div>
   <div class="p-body" id="pbody" hidden>
+    <section class="sec labroot" id="parkExpand"></section>
     <section class="sec">
       <h2>PARAMÉDICOS</h2>
       <button class="btn medic" id="medicBtn" aria-pressed="false">✚ SEM PARAMÉDICOS</button>
@@ -355,6 +389,7 @@
 <div class="lab-modal" id="labModal" hidden><div class="lab-modal-box plate labroot" id="labModalBox"></div></div>
 <div id="toasts"></div>
 
+<button class="btn primary" id="expandBtn" hidden></button>
 <div class="hint">
   <span><kbd>ARRASTAR</kbd>girar (num boneco, gira ele)</span>
   <span><kbd>ROLAR</kbd>zoom</span>
@@ -1246,7 +1281,7 @@ scene.add(partMesh);
 const parts = [];
 const COL = {
   smoke: new THREE.Color('#4a4662'), zap: new THREE.Color('#ffd23f'), zap2: new THREE.Color('#fff3a6'),
-  vomit: new THREE.Color('#a8d84a'), soul: new THREE.Color('#5ff5ff'), bat: new THREE.Color('#3a2d5c'), wisp: new THREE.Color('#7a3fc0'), red: new THREE.Color('#e0303c'), puff: new THREE.Color('#8b87a6'),
+  slime: new THREE.Color('#2fd4c0'), vomit: new THREE.Color('#a8d84a'), soul: new THREE.Color('#5ff5ff'), bat: new THREE.Color('#3a2d5c'), wisp: new THREE.Color('#7a3fc0'), red: new THREE.Color('#e0303c'), puff: new THREE.Color('#8b87a6'),
 };
 function emit(x, y, z, vx, vy, vz, life, size, col, grav = 0) {
   if (parts.length >= PART_MAX) parts.shift();
@@ -1351,17 +1386,17 @@ function voxelGeo(name) {
   voxCache.set(name, g);
   return g;
 }
-/* ---------- geleca translúcida (personagem original) ---------- */
-// Corpo liso de gelatina, com casca brilhante e uma caveira boiando dentro. Duas passadas transparentes
+/* ---------- geleca: slime translúcido que rasteja pelo chão (personagem original) ---------- */
+// Corpo baixo de gelatina com casca brilhante e dois olhinhos. Duas passadas transparentes
 // (fundo e frente) dão a sensação de volume sem precisar de reflexo de verdade.
-const GELECA_H = 2.5;
+const GELECA_H = 1.6;
 const gelecaGeo = (() => {
   const g = new THREE.SphereGeometry(1, 72, 54), p = g.attributes.position;
   for (let i = 0; i < p.count; i++) {
     const x = p.getX(i), y = p.getY(i), z = p.getZ(i), t = (y + 1) / 2, a = Math.atan2(z, x);
-    const skirt = 1 + 0.42 * Math.exp(-((t / 0.2) ** 2));
-    const k = 0.82 * skirt + 0.045 * Math.sin(t * 26 + a * 2) * Math.pow(1 - t, 1.5) + 0.07 * Math.sin(a * 3 + 1.1) * (1 - t) ** 2;
-    const h = GELECA_H * Math.pow(t, 0.85) + 0.1 * Math.max(0, Math.cos(a * 4)) * t ** 8;
+    const skirt = 1 + 0.3 * Math.exp(-((t / 0.22) ** 2));
+    const k = 1.12 * skirt + 0.03 * Math.sin(t * 18 + a * 2) * Math.pow(1 - t, 1.5) + 0.08 * Math.sin(a * 3 + 1.1) * (1 - t) ** 2;
+    const h = GELECA_H * Math.pow(t, 0.85);
     p.setXYZ(i, x * k, h, z * k);
   }
   g.computeVertexNormals();
@@ -1395,22 +1430,29 @@ const JELLY_FS = `
     gl_FragColor = vec4(col, clamp(a * mix(1.0, 0.55, uBack), 0.0, 1.0));
     #include <colorspace_fragment>
   }`;
-const JELLY_C = { uDeep: new THREE.Color('#7a1fa8'), uMid: new THREE.Color('#ff5fbf'), uRim: new THREE.Color('#ffc4ee') };
-const skullGeo = quadsGeo(voxelPartQuads(modelJellySkull, 0.07)), jawGeo = quadsGeo(voxelPartQuads(modelJellyJaw, 0.07));
-const bubbleGeo = new THREE.SphereGeometry(1, 10, 8), bubbleMat = new THREE.MeshBasicMaterial({ color: 0xffd6f4, transparent: true, opacity: 0.7, fog: false });
+const JELLY_C = { uDeep: new THREE.Color('#0b7f86'), uMid: new THREE.Color('#2fd4c0'), uRim: new THREE.Color('#c9fff4') };
+const bubbleGeo = new THREE.SphereGeometry(1, 10, 8), bubbleMat = new THREE.MeshBasicMaterial({ color: 0xd8fff6, transparent: true, opacity: 0.7, fog: false });
+const eyeDarkMat = new THREE.MeshBasicMaterial({ color: 0x07252a, fog: false }), eyeShineMat = new THREE.MeshBasicMaterial({ color: 0xffffff, fog: false });
 function makeGeleca(scared) {
-  const g = new THREE.Group(), ph = Math.random() * 6.28;
-  const skull = new THREE.Group(), head = new THREE.Mesh(skullGeo, matMon), jaw = new THREE.Mesh(jawGeo, matMon);
-  skull.add(head, jaw); skull.position.set(0, 0.8, 0.05);
-  head.position.y = 0.14; jaw.position.set(0, scared ? -0.06 : 0.03, 0.02);
-  g.add(skull);
+  const g = new THREE.Group(), ph = Math.random() * 6.28, sqBase = scared ? 0.2 : 0;
+  // olhos e boca ficam por fora da casca, para não sumirem atrás da gelatina
+  const face = new THREE.Group();
+  const part = (mat, x, y, z, sx, sy, sz) => { const m = new THREE.Mesh(bubbleGeo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); face.add(m); return m; };
+  for (const sd of [-1, 1]) {
+    const k = scared ? 1.3 : 1;
+    part(eyeDarkMat, sd * 0.36, 1.0, 1.08, 0.13 * k, 0.17 * k, 0.07);
+    part(eyeShineMat, sd * 0.36 - 0.04, 1.06, 1.15, 0.04, 0.05, 0.02);
+  }
+  part(eyeDarkMat, 0, 0.72, 1.14, scared ? 0.16 : 0.09, scared ? 0.14 : 0.03, 0.05);
+  g.add(face);
+  const mats = [];
   const layer = (side, back, order) => {
     const m = new THREE.Mesh(gelecaGeo, new THREE.ShaderMaterial({
       vertexShader: JELLY_VS, fragmentShader: JELLY_FS, transparent: true, side, depthWrite: !back, fog: false,
       uniforms: { uTime: U.time, uPh: { value: ph }, uSq: { value: scared ? 0.2 : 0 }, uBack: { value: back ? 1 : 0 }, uDeep: { value: JELLY_C.uDeep }, uMid: { value: JELLY_C.uMid }, uRim: { value: JELLY_C.uRim } },
     }));
     m.layers.set(1); m.renderOrder = order;
-    g.add(m);
+    g.add(m); mats.push(m.material);
     return m;
   };
   layer(THREE.BackSide, true, 5);
@@ -1422,10 +1464,12 @@ function makeGeleca(scared) {
     return { m, a: (i / 7) * 6.28, r: 0.25 + (i % 3) * 0.2, y: (i / 7) * 2.2, v: 0.25 + (i % 4) * 0.1, s: 0.035 + (i % 3) * 0.018 };
   });
   g.userData.tick = (dt) => {
-    skull.position.y = 0.8 + Math.sin(U.time.value * 1.4 + ph) * 0.07 + (scared ? 0.35 : 0);
-    skull.rotation.y = Math.sin(U.time.value * 0.8 + ph) * 0.25;
+    // o corpo encolhe e estica enquanto rasteja; o rosto acompanha
+    const sq = sqBase + Math.sin(U.time.value * 5 + ph) * 0.07;
+    for (const mat of mats) mat.uniforms.uSq.value = sq;
+    face.position.y = (sq + Math.sin(U.time.value * 2.3 + ph) * 0.04) * 1.0;
     for (const b of bubbles) {
-      b.y += b.v * dt; if (b.y > 2.2) b.y = 0.15;
+      b.y += b.v * dt; if (b.y > 1.2) b.y = 0.15;
       b.m.position.set(Math.cos(b.a + b.y) * b.r, b.y, Math.sin(b.a + b.y) * b.r);
       b.m.scale.setScalar(b.s);
     }
@@ -1435,7 +1479,7 @@ function makeGeleca(scared) {
 }
 // gotas que espirram no susto
 const DROP_MAX = 60;
-const dropMesh = new THREE.InstancedMesh(bubbleGeo, new THREE.MeshBasicMaterial({ color: 0xff7fd0, fog: false }), DROP_MAX);
+const dropMesh = new THREE.InstancedMesh(bubbleGeo, new THREE.MeshBasicMaterial({ color: 0x5fe8d4, fog: false }), DROP_MAX);
 dropMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); dropMesh.layers.set(1); dropMesh.frustumCulled = false; dropMesh.count = 0;
 scene.add(dropMesh);
 const drops = [], _dm = new THREE.Matrix4(), _dp = new THREE.Vector3(), _ds = new THREE.Vector3(), _dq = new THREE.Quaternion();
@@ -1853,6 +1897,11 @@ function updateHUD() {
   const e = estimate();
   $('farm').textContent = `≈ ${fmtN(Math.max(0, e.farm), 2)} $MEDO/h`;
   $('loss').textContent = e.loss > 0.005 ? `≈ ${fmtN(e.loss, 2)}/h perdidos em infartos` : '';
+  $('itemBox').disabled = !Game.canAfford(LAB_ITEM_MINT);
+  $('itemBoxPrice').textContent = Game.s.infinite ? 'Grátis' : LAB_ITEM_MINT + ' $MEDO';
+  const nextIsle = Lab.nextLevel();
+  $('expandBtn').hidden = !nextIsle;
+  if (nextIsle) $('expandBtn').textContent = '+ EXPANDIR · ' + (Game.s.infinite ? 'GRÁTIS' : nextIsle.cost + ' $MEDO');
   $('carry').textContent = '+' + fmtN(train.carry, 3);
   $('carryBar').style.width = (train.state === 'running' ? (train.dist / LAP) * 100 : 0) + '%';
   if (selected && selected.mon) $('cCount').textContent = selected.mon.count.toLocaleString('pt-BR');
@@ -1860,10 +1909,7 @@ function updateHUD() {
 function updateMintUI() {
   const free = slots.filter((s) => !s.mon && !s.minting).length;
   $('mintBtn').disabled = free === 0;
-  $('mintBtn').textContent = free ? 'MINTAR BONECO' : 'VAGAS CHEIAS';
-  $('mintNote').textContent = free
-    ? `Grátis na demo. Sorteia a raridade com as chances do jogo e põe o boneco numa vaga livre (${free} de ${slots.length}).`
-    : 'Todas as vagas estão ocupadas. Clique num boneco e tire ele da vaga para abrir espaço.';
+  $('mintNote').textContent = free ? `Grátis · ${free} ${free > 1 ? 'vagas' : 'vaga'}` : 'Vagas cheias';
 }
 function updateRoster() {
   const list = onTrack();
@@ -1917,6 +1963,7 @@ function placeMonster(slot, kind, instant = false, rec = null) {
   const label = pxSprite(textTex(MON[kind].short, rar.color));
   slot.mon = { rec, kind, rarity: rar.key, g, body, scared, label, n, hgt: jelly ? GELECA_H : body.geometry.boundingBox.max.y, face: view.yaw, spin: 0, tilt: 0, held: false, spinT: 0, scareT: 0, appear: instant ? 1 : 0, ph: Math.random() * 6, hop: mr(1, 4), count: 0 };
   slot.ringMat.color.set(rar.color);
+  slot.proxy.position.set(slot.x, 1.7, slot.z);
   updateRoster(); updateMintUI();
   if (!instant) Game.emit('change');
 }
@@ -1940,7 +1987,7 @@ function scareAnim(slot) {
   if (!m) return;
   m.scareT = 0.75;
   m.body.visible = false; m.scared.visible = true;
-  if (m.kind === 'geleca') jellyBurst(slot.x, m.hgt + 0.6, slot.z);
+  if (m.kind === 'geleca') jellyBurst(m.g.position.x, m.hgt + 0.3, m.g.position.z);
   for (let i = 0; i < 6; i++) emit(slot.x - slot.nx * 0.6, mr(1.2, 2.4), slot.z - slot.nz * 0.6, -slot.nx * mr(0.5, 1.4), mr(0.2, 0.8), -slot.nz * mr(0.5, 1.4), mr(0.5, 0.8), mr(0.12, 0.2), COL.bat, 0);
 }
 // mintar: a cripta brilha, um raio vai até a vaga e o boneco sobe do chão
@@ -2009,6 +2056,14 @@ function updateMonsters(dt, dtReal) {
     m.g.rotation.set(m.tilt, m.face + m.spin, 0);
     m.g.scale.setScalar(sc);
     m.g.position.set(s.x - s.nx * lunge, y, s.z - s.nz * lunge);
+    if (m.kind === 'geleca') {
+      // a geleca não fica no pedestal: rasteja pelo chão, de um lado para o outro, ao lado da vaga
+      m.crawl = (m.crawl === undefined ? m.ph : m.crawl) + dt * 0.5;
+      const side = Math.sin(m.crawl) * 1.8, cx = s.x + s.nx * 1.4 + s.nz * side - s.nx * lunge * 2, cz = s.z + s.nz * 1.4 - s.nx * side - s.nz * lunge * 2;
+      m.g.position.set(cx, y - PED_H + 0.02, cz);
+      s.proxy.position.set(cx, 1.7, cz);
+      if (dt > 0 && Math.random() < dt * 2.5) emit(cx + mr(-0.5, 0.5), 0.06, cz + mr(-0.5, 0.5), 0, 0, 0, mr(0.8, 1.4), mr(0.06, 0.11), COL.slime);
+    }
     m.label.sp.visible = settings.names && ap >= 1;
     m.label.sp.position.set(m.g.position.x, y + m.hgt * sc + 0.15, m.g.position.z);
     if (m.buff) { m.buff.sp.visible = settings.names && ap >= 1; m.buff.sp.position.set(m.g.position.x, y + m.hgt * sc + 1.1, m.g.position.z); }
@@ -2249,7 +2304,7 @@ const vitrine = (() => {
     scared = jelly ? makeGeleca(true) : new THREE.Mesh(voxelGeo(SPRITES[kind + '_s'] ? kind + '_s' : kind), matMon);
     scared.visible = false;
     holder.add(body, scared);
-    const bb = jelly ? { min: { x: -1.3, y: 0 }, max: { x: 1.3, y: GELECA_H } } : body.geometry.boundingBox, hgt = bb.max.y - bb.min.y;
+    const bb = jelly ? { min: { x: -1.5, y: 0 }, max: { x: 1.5, y: GELECA_H } } : body.geometry.boundingBox, hgt = bb.max.y - bb.min.y;
     const half = (Math.max(hgt + 0.7, bb.max.x - bb.min.x, 2.8) / 2) * 1.12, cy = (bb.max.y - 0.4) / 2;
     Object.assign(cm, { left: -half, right: half, top: half, bottom: -half });
     cm.position.set(0, cy + 6, 14); cm.lookAt(0, cy, 0); cm.updateProjectionMatrix();
@@ -2451,7 +2506,14 @@ function setPixel(on) {
 }
 $('medicBtn').addEventListener('click', () => setMedics(!econ.medics));
 document.querySelectorAll('[data-mult]').forEach((b) => b.addEventListener('click', () => setMult(+b.dataset.mult)));
-$('mintBtn').addEventListener('click', () => mint());
+$('mintBtn').addEventListener('click', () => { popBox($('mintBtn')); mint(); });
+$('itemBox').addEventListener('click', openItemBox);
+$('expandBtn').addEventListener('click', () => {
+  setTab('park');
+  $('panel').classList.add('open');
+  $('toggle').setAttribute('aria-expanded', 'true');
+  $('toggle').textContent = 'FECHAR';
+});
 $('cClose').addEventListener('click', closeCard);
 $('cScare').addEventListener('click', () => selected && selectSlot(selected, true));
 $('cRemove').addEventListener('click', () => selected && removeMonster(selected));
@@ -2512,13 +2574,6 @@ window.World = {
     const st = Lab.st(), inv = Lab.items();
     if (a === 'labturbo') { if (turboOwned() < LAB_TURBO.max && Game.spend(LAB_TURBO.cost)) { st.turbo = (st.turbo || 0) + 1; Lab.afterFix(); } return true; }
     if (a === 'labturbodown') { st.turbo = Math.max(0, (st.turbo || 0) - 1); Lab.afterFix(); return true; }
-    if (a === 'itemmint') {
-      if (!Game.spend(LAB_ITEM_MINT)) return true;
-      const keys = Object.keys(LAB_ITEMS), key = keys[Math.floor(Math.random() * keys.length)];
-      inv.inv[key] = (inv.inv[key] || 0) + 1;
-      toast('Saiu do mint: ' + LAB_ITEMS[key].name + '!', 'good');
-      Lab.afterFix(); return true;
-    }
     if (a === 'itemisle') { itemIsle = +d.i; renderItems(true); return true; }
     if (a === 'itemequip') {
       const spot = itemSpotsOf(itemIsle).slice(0, itemOpen(itemIsle)).find((s) => !inv.equip[s.i]);
@@ -2591,8 +2646,54 @@ function setTab(t) {
   }
   if (t === 'lab') renderLab();
   if (t === 'items') renderItems(true);
+  if (t === 'park') renderPark();
 }
-// aba ITENS: mint, inventário e os slots de cada ilha
+// caixinhas de mint: a caixa treme ao abrir; a de itens mostra por um instante o que saiu
+function popBox(el) { el.classList.remove('open'); void el.offsetWidth; el.classList.add('open'); }
+let itemBoxTimer = 0;
+function openItemBox() {
+  if (!Game.spend(LAB_ITEM_MINT)) return;
+  const inv = Lab.items(), keys = Object.keys(LAB_ITEMS), key = keys[Math.floor(Math.random() * keys.length)];
+  inv.inv[key] = (inv.inv[key] || 0) + 1;
+  const box = $('itemBox'), art = $('itemBoxArt');
+  popBox(box);
+  art.dataset.spr = Lab.lookSprite(key);
+  hydrate(box);
+  $('itemBoxName').textContent = 'SAIU!';
+  clearTimeout(itemBoxTimer);
+  itemBoxTimer = setTimeout(() => { art.dataset.spr = 'lab_chest'; hydrate(box); $('itemBoxName').textContent = 'ITENS'; }, 1600);
+  toast('Saiu da caixa: ' + LAB_ITEMS[key].name + '!', 'good');
+  updateHUD();
+  Lab.afterFix();
+}
+// aba PARQUE: expansão do mapa (na grade 3x3, a ilha principal é a 2) e os trechos de turbo
+let parkHtml = '';
+function renderPark() {
+  const mode = Lab.picks.map, next = Lab.nextLevel();
+  let body = '<p class="note">A expansão está desligada. Ligue em TESTE, MAPA.</p>';
+  if (mode !== 'off') {
+    let grid = '';
+    if (mode === 'islands') {
+      const byPos = Object.fromEntries(islesSt.map((it) => [it.pos, it])), nextPos = ISLE_ORDER[islesSt.length];
+      grid = `<div class="isle-grid">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((p) => {
+        if (p === 2) return '<div class="isle-cell main">PRINCIPAL</div>';
+        const it = byPos[p];
+        if (it) return `<div class="isle-cell ${it.rarity}">${ISLE_TYPES[it.type].name.toUpperCase()}<br>${ISLE_RARITY[it.rarity].label}</div>`;
+        return p === nextPos ? '<div class="isle-cell next">PRÓXIMA</div>' : `<div class="isle-cell">${p}</div>`;
+      }).join('')}</div>`;
+    }
+    const btn = next
+      ? `<button class="btn primary" data-act="labup" ${Game.canAfford(next.cost) ? '' : 'disabled'}>${mode === 'islands' ? 'COMPRAR ILHA' : 'EXPANDIR'} · ${Game.s.infinite ? 'GRÁTIS' : next.cost + ' $MEDO'}</button>`
+      : '<span class="tag">TUDO COMPRADO</span>';
+    body = `${grid}${btn}${next && mode === 'islands' ? '<p class="muted small">A raridade e o tipo saem na compra: comum, rara ou lendária.</p>' : ''}`;
+  }
+  const turbo = World.trackPanel();
+  const html = `<h2>EXPANDIR O PARQUE</h2>${body}${turbo ? `<h2>TRECHOS TURBO</h2>${turbo}` : ''}`;
+  if (html === parkHtml) return;
+  parkHtml = html;
+  $('parkExpand').innerHTML = html;
+}
+// aba ITENS: inventário e os slots de cada ilha
 const itemSpotsOf = (isle) => ITEM_SLOTS.filter((s) => s.isle === isle);
 const itemOpen = (isle) => { const open = Lab.items().open[isle], cap = itemSpotsOf(isle).length; return Math.min(cap, open === undefined ? Math.max(1, Math.floor(cap / 2)) : open); };
 const itemIsleName = (isle) => (isle < 0 ? 'Principal' : `Ilha ${PLAN[isle].pos}`);
@@ -2603,10 +2704,8 @@ function renderItems(force) {
   if (!isles.includes(itemIsle)) itemIsle = -1;
   const spots = itemSpotsOf(itemIsle), open = itemOpen(itemIsle);
   const html = `${active ? '' : '<p class="muted small">Ative em TESTE, ENFEITES: INVENTÁRIO, para os itens valerem.</p>'}
-    <h4>MINT DE ITENS</h4>
-    <button class="btn primary" data-act="itemmint" ${Game.canAfford(LAB_ITEM_MINT) ? '' : 'disabled'}>MINTAR ITEM · ${Game.s.infinite ? 'GRÁTIS' : LAB_ITEM_MINT + ' $MEDO'}</button>
     <h4>INVENTÁRIO</h4>
-    ${owned.length ? `<div class="item-list">${owned.map(([k, it]) => `<div class="item-row">${sprHtml(Lab.lookSprite(k), 2)}<span><b>${it.name}</b> x${inv.inv[k]}<br><span class="muted small">${LabUI.itemEffect({ farm: it.farm * LAB_ITEM_POWER, heart: Math.max(0.2, 1 - (1 - it.heart) * LAB_ITEM_POWER) })}</span></span><button class="btn sm" data-act="itemequip" data-key="${k}">EQUIPAR</button></div>`).join('')}</div>` : '<p class="muted small">Nenhum item ainda. Faça um mint.</p>'}
+    ${owned.length ? `<div class="item-list">${owned.map(([k, it]) => `<div class="item-row">${sprHtml(Lab.lookSprite(k), 2)}<span><b>${it.name}</b> x${inv.inv[k]}<br><span class="muted small">${LabUI.itemEffect({ farm: it.farm * LAB_ITEM_POWER, heart: Math.max(0.2, 1 - (1 - it.heart) * LAB_ITEM_POWER) })}</span></span><button class="btn sm" data-act="itemequip" data-key="${k}">EQUIPAR</button></div>`).join('')}</div>` : '<p class="muted small">Nenhum item ainda. Abra a caixa de itens na aba BONECOS.</p>'}
     <h4>SLOTS DA ILHA</h4>
     <div class="chips">${isles.map((i) => `<button class="chip${i === itemIsle ? ' on' : ''}" data-act="itemisle" data-i="${i}" style="--c:var(--gold)">${itemIsleName(i).toUpperCase()}</button>`).join('')}</div>
     <div class="item-slots">${spots.map((s, n) => { const key = inv.equip[s.i]; if (n >= open) return '<div class="item-slot locked">🔒</div>'; return key ? `<button class="item-slot full" data-act="itemun" data-i="${s.i}" title="Tirar ${LAB_ITEMS[key].name}">${sprHtml(Lab.lookSprite(key), 2)}</button>` : '<div class="item-slot">vazio</div>'; }).join('')}</div>
@@ -2632,6 +2731,7 @@ LabUI.bind({
 const labClick = (e) => { const b = e.target.closest('[data-act]'); if (b && !b.disabled) LabUI.act(b.dataset.act, b.dataset); };
 $('labPanel').addEventListener('click', labClick);
 $('itemsPanel').addEventListener('click', labClick);
+$('parkExpand').addEventListener('click', labClick);
 $('cLab').addEventListener('click', labClick);
 $('labModal').addEventListener('click', (e) => {
   if (e.target.id === 'labModal' || e.target.closest('[data-close]')) closeModal(); else labClick(e);
@@ -2646,6 +2746,7 @@ function labChanged() {
   syncDecor(); syncLinks(); syncBuffLabels(); syncPads();
   if (tab3d === 'lab') renderLab();
   renderItems();
+  renderPark();
   updateRoster();
   if (selected && selected.mon) fillCard(selected);
 }
@@ -2940,7 +3041,8 @@ if (window.innerWidth < 760) { settings.px = 2; $('px').value = '2'; $('pxOut').
 setPixel(settings.pixel);
 setMult(econ.mult);
 updateMintUI();
-syncDecor(); syncLinks(); syncBuffLabels(); syncPads(); renderLab();
+syncDecor(); syncLinks(); syncBuffLabels(); syncPads(); renderLab(); renderPark();
+hydrate($('monsBody'));
 if (econ.medics) { medicGroup.visible = true; setMedics(true); }
 {
   // o tempo fora do jogo rende (e desgasta) como no clássico
@@ -2951,7 +3053,8 @@ if (econ.medics) { medicGroup.visible = true; setMedics(true); }
     const was = +sessionStorage.getItem('lab3d.scale');
     if (was && MAP_S > was) { view.zoom = MAP_S / was; view.intro = 2.4; toast('Mapa expandido! Veja as vagas novas.', 'good'); }
     if (sessionStorage.getItem('lab3d.sec')) LabUI.sec = sessionStorage.getItem('lab3d.sec');
-    if (sessionStorage.getItem('lab3d.tab') === 'lab') { setTab('lab'); $('labBody').scrollTop = +sessionStorage.getItem('lab3d.scroll') || 0; }
+    const savedTab = sessionStorage.getItem('lab3d.tab');
+    if (savedTab) { setTab(savedTab); if (savedTab === 'lab') $('labBody').scrollTop = +sessionStorage.getItem('lab3d.scroll') || 0; }
     for (const k of ['lab3d.scale', 'lab3d.tab', 'lab3d.scroll', 'lab3d.sec']) sessionStorage.removeItem(k);
   } catch (e) { /* sem storage */ }
 }

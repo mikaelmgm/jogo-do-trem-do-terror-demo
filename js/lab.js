@@ -457,6 +457,25 @@ Object.assign(SPRITES, {
     '................',
     '................',
   ],
+  // caixa de itens
+  lab_chest: [
+    '................',
+    '...kkkkkkkkkk...',
+    '..kUUUUUUUUUUk..',
+    '.kUQUUUUUUUUQUk.',
+    '.kUQUUUUUUUUQUk.',
+    '.kkkkkkkkkkkkkk.',
+    '.kyyyyykkyyyyyk.',
+    '.kQQQQkyYkQQQQk.',
+    '.kQUUQkYykQUUQk.',
+    '.kQUUQQkkQQUUQk.',
+    '.kQUUUUQQUUUUQk.',
+    '.kQQQQQQQQQQQQk.',
+    '.kyyyyyyyyyyyyk.',
+    '.kkkkkkkkkkkkkk.',
+    '................',
+    '................',
+  ],
   // manutenção
   lab_oil: [
     '................',

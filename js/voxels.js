@@ -259,21 +259,6 @@ function modelReaper(v, scared) {
   }
 }
 
-// caveira que boia dentro da geleca (a mandíbula é uma peça separada, para abrir no susto)
-function modelJellySkull(v) {
-  const B = '#f2f0f7', G = '#c3c0d6', K = '#1b1024';
-  v.ball(0, 8, 0, 7, 6.5, 6, B);
-  v.box(-4, 4, 1, 3, -2, 4, B);
-  v.sym((s) => { v.decal(s > 0 ? 1 : -4, s > 0 ? 4 : -1, 7, 10, K); v.decal(s > 0 ? 2 : -3, s > 0 ? 2 : -3, 8, 9, '#ff5fbf'); });
-  v.decal(0, 0, 4, 6, K); v.decal(-1, 1, 4, 4, K);
-  for (let x = -3; x <= 3; x += 2) v.decal(x, x, 1, 3, G);
-}
-function modelJellyJaw(v) {
-  const B = '#f2f0f7', G = '#c3c0d6';
-  v.rbox(-4, 4, 0, 2, -2, 4, B);
-  for (let x = -3; x <= 3; x += 2) v.decal(x, x, 1, 2, G);
-}
-
 const VOXEL_MODELS = {
   ghost:   { style: 'A', unit: 0.11, label: 'Fantasma',   build: modelGhost },
   zombie:  { style: 'A', unit: 0.11, label: 'Zumbi',      build: modelZombie },
@@ -294,8 +279,4 @@ function voxelModelQuads(name) {
   M.build(v, scared);
   return meshVoxGrid(v, M.unit);
 }
-function voxelPartQuads(build, unit) {
-  const v = new VoxGrid();
-  build(v);
-  return meshVoxGrid(v, unit);
-}
+
