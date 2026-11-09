@@ -889,7 +889,7 @@ const World = (() => {
     if (!m || !Lab.canScare(m)) return;
     const riders = [t.seats[k * 2], t.seats[k * 2 + 1]].filter(r => r && r.state === 'ride');
     if (!riders.length) return;
-    const rar = RAR[m.rarity], reward = Game.rewardOf(m) * Game.eventFarm(m) * Lab.cartFactor(t.color);
+    const rar = RAR[m.rarity], reward = Game.rewardOf(m) * Game.eventFarm(m);
     const amount = reward * riders.length;
     Game.scared(riders.length);
     anim(m.id).t = 0;
@@ -899,7 +899,7 @@ const World = (() => {
     riders.forEach(r => { r.scaredT = 1 + rar.power * 0.15; r.earned = (r.earned || 0) + reward; });
     for (let j = 0; j < 2; j++) {
       const r = t.seats[k * 2 + j];
-      if (r && r.state === 'ride' && Math.random() < Lab.heartOf(m) * Game.eventHeart() * HEART_MULT) heartAttack(t, k * 2 + j, m);
+      if (r && r.state === 'ride' && Math.random() < Lab.heartOf(m) * Lab.cartHeart(t.color) * Game.eventHeart() * HEART_MULT) heartAttack(t, k * 2 + j, m);
     }
     const p = track.at(t.s - k * CAR_GAP);
     floatText(p.x, p.y - 18, '+' + amount.toFixed(4), rar.color);

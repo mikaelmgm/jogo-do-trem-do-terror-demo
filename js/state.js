@@ -51,6 +51,7 @@ const MONSTERS = [
   { key: 'jigsaw',    rarity: 'epico',    name: 'Jigsaw (SAW)',   short: 'JIGSAW' },
   { key: 'joker',     rarity: 'epico',    name: 'Coringa',        short: 'CORINGA' },
   { key: 'xeno',      rarity: 'epico',    name: 'Xenomorfo',      short: 'XENOMORFO' },
+  { key: 'geleca',    rarity: 'epico',    name: 'Geleca',         short: 'GELECA' },
   { key: 'reaper',    rarity: 'lendario', name: 'Dementador',     short: 'DEMENTADOR', float: true },
   { key: 'pennywise', rarity: 'lendario', name: 'Pennywise',      short: 'PENNYWISE' },
   { key: 'krueger',   rarity: 'lendario', name: 'Freddy Krueger', short: 'KRUEGER' },

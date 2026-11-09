@@ -47,7 +47,7 @@ const LAB_CLASSES = {
     assombracao: { label: 'ASSOMBRAÇÃO', color: '#9fd8ff', power: { farm: 0.06, heart: 0.85 }, kinds: ['ghost', 'samara', 'reaper', 'krueger', 'pinhead', 'pyramid'] },
     cinema:      { label: 'CINEMA',      color: '#ff6a6a', power: { farm: 0.2,  heart: 1.12 }, kinds: ['ghostface', 'jason', 'myers', 'jigsaw', 'joker', 'vader'] },
     boneco:      { label: 'BRINQUEDO',   color: '#ffb52e', power: { farm: 0.1,  heart: 0.95 }, kinds: ['annabelle', 'chucky', 'foxy', 'fazbear', 'pennywise'] },
-    fera:        { label: 'FERA',        color: '#d0905a', power: { farm: 0.18, heart: 1.08 }, kinds: ['sirenhead', 'wolf', 'xeno'] },
+    fera:        { label: 'FERA',        color: '#d0905a', power: { farm: 0.18, heart: 1.08 }, kinds: ['sirenhead', 'wolf', 'xeno', 'geleca'] },
     desenho:     { label: 'DESENHO',     color: '#5ee07a', power: { farm: 0.05, heart: 0.8 },  kinds: ['mike', 'sulley', 'shrek', 'grinch', 'teemo'] },
     lenda:       { label: 'LENDA',       color: '#c58bff', power: { farm: 0.12, heart: 1 },    kinds: ['momo', 'saci', 'slender', 'herobrine', 'creeper', 'trump'] },
   },
@@ -55,14 +55,17 @@ const LAB_CLASSES = {
     morto:    { label: 'MORTO-VIVO', color: '#9ccf6a', power: { farm: 0.14, heart: 1 },    kinds: ['zombie', 'mummy', 'frank', 'vamp', 'nemesis'] },
     fantasma: { label: 'FANTASMA',   color: '#9fd8ff', power: { farm: 0.07, heart: 0.88 }, kinds: ['ghost', 'samara', 'reaper', 'krueger', 'pinhead', 'pyramid', 'momo', 'slender', 'herobrine', 'saci', 'creeper', 'trump'] },
     filme:    { label: 'FILME',      color: '#ff6a6a', power: { farm: 0.18, heart: 1.1 },  kinds: ['ghostface', 'jason', 'myers', 'jigsaw', 'joker', 'vader', 'annabelle', 'chucky', 'foxy', 'fazbear', 'pennywise'] },
-    monstro:  { label: 'MONSTRO',    color: '#d0905a', power: { farm: 0.1,  heart: 0.95 }, kinds: ['sirenhead', 'wolf', 'xeno', 'mike', 'sulley', 'shrek', 'grinch', 'teemo'] },
+    monstro:  { label: 'MONSTRO',    color: '#d0905a', power: { farm: 0.1,  heart: 0.95 }, kinds: ['sirenhead', 'wolf', 'xeno', 'mike', 'sulley', 'shrek', 'grinch', 'teemo', 'geleca'] },
   },
+  // um boneco pode estar em mais de um medo: conta como colega de quem dividir qualquer um deles
   medos: {
-    sangue:       { label: 'SANGUE',       color: '#ff5a6a', power: { farm: 0.2,  heart: 1.12 }, kinds: ['jason', 'myers', 'ghostface', 'jigsaw', 'krueger', 'pinhead', 'nemesis', 'xeno', 'wolf'] },
-    sobrenatural: { label: 'SOBRENATURAL', color: '#9fd8ff', power: { farm: 0.1,  heart: 0.9 },  kinds: ['ghost', 'samara', 'reaper', 'vamp', 'pyramid', 'zombie', 'mummy', 'frank'] },
-    infancia:     { label: 'INFÂNCIA',     color: '#ffb52e', power: { farm: 0.08, heart: 0.85 }, kinds: ['annabelle', 'chucky', 'foxy', 'fazbear', 'pennywise', 'mike', 'sulley', 'teemo'] },
-    bizarro:      { label: 'BIZARRO',      color: '#5ee07a', power: { farm: 0.14, heart: 1 },    kinds: ['shrek', 'grinch', 'saci', 'sirenhead', 'momo'] },
-    pop:          { label: 'CULTURA POP',  color: '#c58bff', power: { farm: 0.12, heart: 1 },    kinds: ['slender', 'herobrine', 'creeper', 'joker', 'vader', 'trump'] },
+    morte:    { label: 'MORTE',    color: '#9ccf6a', power: { farm: 0.14, heart: 1 },    kinds: ['zombie', 'mummy', 'frank', 'vamp', 'nemesis', 'reaper'] },
+    sangue:   { label: 'SANGUE',   color: '#ff5a6a', power: { farm: 0.2,  heart: 1.12 }, kinds: ['jason', 'myers', 'ghostface', 'jigsaw', 'krueger', 'pinhead', 'chucky', 'xeno', 'joker'] },
+    alem:     { label: 'ALÉM',     color: '#9fd8ff', power: { farm: 0.1,  heart: 0.9 },  kinds: ['ghost', 'samara', 'reaper', 'krueger', 'pinhead', 'annabelle', 'pyramid', 'slender', 'herobrine'] },
+    infancia: { label: 'INFÂNCIA', color: '#ffb52e', power: { farm: 0.08, heart: 0.85 }, kinds: ['annabelle', 'chucky', 'foxy', 'fazbear', 'pennywise', 'mike', 'sulley', 'teemo', 'grinch', 'shrek'] },
+    fera:     { label: 'FERA',     color: '#d0905a', power: { farm: 0.16, heart: 1.05 }, kinds: ['wolf', 'xeno', 'sirenhead', 'foxy', 'sulley', 'geleca'] },
+    filme:    { label: 'FILME',    color: '#c58bff', power: { farm: 0.12, heart: 1 },    kinds: ['krueger', 'jason', 'myers', 'ghostface', 'jigsaw', 'pennywise', 'chucky', 'samara', 'annabelle', 'shrek', 'mike', 'sulley', 'joker', 'vader', 'xeno', 'pinhead', 'grinch'] },
+    lenda:    { label: 'LENDA',    color: '#5ff5ff', power: { farm: 0.12, heart: 1 },    kinds: ['saci', 'momo', 'slender', 'sirenhead', 'herobrine', 'creeper', 'trump', 'geleca'] },
   },
 };
 const LAB_RADIUS = 75;                                  // alcance da classe (px do mapa)
@@ -88,17 +91,25 @@ const LAB_LOT_RADIUS = 62;     // alcance de um enfeite no canteiro
 const LAB_ACC_POWER = 1.5;     // enfeite preso na vaga vale mais, mas só para um boneco
 const LAB_GLOBAL_POWER = 0.35; // enfeite na entrada vale para o parque todo, mas fraco
 const LAB_GLOBAL_MAX = 3;
+const LAB_ITEM_POWER = 0.5;    // item equipado vale para os bonecos da ilha dele, com metade da força
+const LAB_ITEM_MINT = 500;     // $MEDO por mint de item
+const LAB_ITEM_SLOT = 800;     // preço base de abrir mais um slot de item numa ilha
 
 // ---------------- trilho especial ----------------
 // speed: velocidade · heart: infarto · reward: valor do susto · trains: carrinhos extras
 // brake: velocidade perto dos bonecos · avg: velocidade média (para a estimativa)
 const LAB_TRACKS = {
   off:   { speed: 1,    heart: 1,    reward: 1,    trains: 0, rails: ['#d8d5e6', '#a9a5bf'], ties: ['#7a5434', '#4e3520'] },
-  turbo: { speed: 1.4,  heart: 1.1,  reward: 1,    trains: 0, rails: ['#ffd23f', '#e08a20'], ties: ['#2a2230', '#ffd23f'], stripes: true },
+  pads:  { speed: 1,    heart: 1,    reward: 1,    trains: 0, rails: ['#d8d5e6', '#a9a5bf'], ties: ['#7a5434', '#4e3520'] },
   calm:  { speed: 0.8,  heart: 0.55, reward: 1,    trains: 0, rails: ['#f0b6e0', '#b884c8'], ties: ['#6a4a8a', '#46305e'], ballast: ['#3a2a52', '#2f2244', '#44325e'] },
   brake: { speed: 1.25, heart: 1.15, reward: 1.2,  trains: 0, rails: ['#ff7a5a', '#b83a2a'], ties: ['#3a2020', '#241414'], brake: 0.45, avg: 1.08 },
   volt:  { speed: 0.92, heart: 1,    reward: 1,    trains: 1, rails: ['#7fe8ff', '#3aa8d0'], ties: ['#2a3a55', '#1c2840'] },
 };
+
+// turbo em trechos: cada trecho comprado acelera o trem por alguns segundos quando ele passa
+const LAB_TURBO = { max: 8, cost: 1500, secs: 5, boost: 1.8 };
+const LAB_TOKENS_PER_MEDO = 100;   // 1 $MEDO do jogo = 100 tokens (mint de 1000 = 100 mil tokens)
+const LAB_MCAP = 30000, LAB_SUPPLY = 1e9;
 
 // ---------------- manutenção ----------------
 const LAB_MAINT_HOURS = [1, 4, 8, 24];                  // tempo até o estrago máximo
@@ -106,62 +117,63 @@ const LAB_ACCEL = [1, 60, 600];                         // acelerador só para t
 const LAB_OIL_MIN = 0.35;                               // velocidade com o trilho todo enferrujado
 const LAB_BAT_LOW = 0.25;                               // abaixo disso o boneco rende menos
 const LAB_COAL = { min: 0.55, max: 1.25, click: 0.2 };  // rendimento da caldeira vazia/cheia
-const LAB_VOMIT_LOSS = 0.7;                             // quanto um carrinho imundo perde
+const LAB_VOMIT_HEART = 2.5;                            // carrinho imundo: infarto até 3,5x maior
 const LAB_PACT = { strike: 0.3, streak: 0.03, cap: 0.3, earliest: 0.5 };
 
 // ---------------- o que aparece na aba ----------------
 const LAB_SYSTEMS = [
-  { key: 'map', title: 'EXPANSÃO DO MAPA', options: [
+  { key: 'map', title: 'EXPANSÃO DO MAPA', def: 'islands', options: [
     { key: 'off',     name: 'ATUAL',        desc: 'Mapa fixo com 8 vagas, como hoje.' },
     { key: 'big',     name: 'ILHA MAIOR',   desc: 'Poucas compras grandes. O chão cresce, o trilho ganha um laço com várias vagas e a câmera se afasta.' },
-    { key: 'islands', name: 'OUTRAS ILHAS', desc: 'Compre ilhas separadas, ligadas por ponte. Cada uma tem visual próprio e um bônus para os bonecos dela.' },
+    { key: 'islands', name: 'OUTRAS ILHAS', desc: 'Compre ilhas separadas, ligadas por ponte. Cada ilha sai com raridade (comum, rara ou lendária) e um tipo, que favorece uma classe de bonecos.' },
     { key: 'bits',    name: 'TRECHOS',      desc: 'Muitas compras baratas. O trilho cresce aos poucos, 2 a 4 vagas por vez.' },
   ] },
-  { key: 'rarity', title: 'GANHO POR RARIDADE', options: [
+  { key: 'rarity', title: 'GANHO POR RARIDADE', def: 'suave', options: [
     { key: 'off',     name: 'ATUAL',          desc: 'Os números de hoje: lendário se paga muito antes do épico.' },
     { key: 'suave',   name: 'ESCADA SUAVE',   desc: 'Cada raridade rende cerca de 30% a mais que a anterior. Comum continua útil até o fim.' },
     { key: 'dobra',   name: 'DOBRA',          desc: 'Cada raridade rende o dobro da anterior. Fácil de entender.' },
     { key: 'comum',   name: 'COMUM FORTE',    desc: 'O começo é rápido e a diferença para o lendário é pequena.' },
     { key: 'estrela', name: 'LENDÁRIO ESTRELA', desc: 'Comum rende pouco, lendário rende muito e mata muito.' },
   ] },
-  { key: 'classRule', title: 'BUFF DE CLASSE', options: [
+  { key: 'classRule', title: 'BUFF DE CLASSE', def: 'vizinho', options: [
     { key: 'off',       name: 'SEM CLASSE', desc: 'Nenhum bônus de classe.' },
     { key: 'vizinho',   name: 'VIZINHOS',   desc: `Cada vizinho da mesma classe, na vaga de antes ou de depois no trilho, dá +${LAB_NEIGHBOR * 100}% de farm.` },
     { key: 'raio',      name: 'ÁREA',       desc: `Cada colega da mesma classe por perto dá +${LAB_RADIUS_EACH * 100}% de farm, até +${LAB_RADIUS_CAP * 100}%.` },
     { key: 'sequencia', name: 'SEQUÊNCIA',  desc: 'Vagas seguidas da mesma classe formam combo: 2 = +8%, 3 = +20%, 4 = +35%, 5 = +55%, 6 ou mais = +80%.' },
     { key: 'poderes',   name: 'PODERES',    desc: 'Cada classe tem um efeito próprio, que vale por colega por perto (até 3).' },
   ] },
-  { key: 'classes', title: 'DIVISÃO DAS CLASSES', options: [
+  { key: 'classes', title: 'DIVISÃO DAS CLASSES', def: 'medos', options: [
     { key: 'sete',   name: '7 ORIGENS', desc: 'De onde o monstro vem. Mais variedade, combos mais difíceis.' },
     { key: 'quatro', name: '4 GRUPOS',  desc: 'Grupos grandes. Combos mais fáceis.' },
-    { key: 'medos',  name: '5 MEDOS',   desc: 'Divide pelo tipo de medo que o monstro dá.' },
+    { key: 'medos',  name: '7 MEDOS',   desc: 'Divide pelo tipo de medo que o monstro dá. Alguns bonecos têm mais de um: o mesmo personagem pode ser de SANGUE e de FILME.' },
   ] },
-  { key: 'heart', title: 'INFARTO E PARAMÉDICO', options: [
+  { key: 'heart', title: 'INFARTO E PARAMÉDICO', def: 'bill', options: [
     { key: 'off',    name: 'ATUAL',          desc: 'Com paramédico o infarto não custa nada: o cliente segue a volta.' },
     { key: 'leave',  name: 'SAI DO PASSEIO', desc: 'Com paramédico ele sobrevive e você não paga indenização, mas ele desce do carrinho e não leva os outros sustos da volta.' },
     { key: 'refund', name: 'ESTORNO',        desc: `Sem paramédico o cliente pega de volta tudo o que pagou na volta e ainda tem indenização. Com paramédico você devolve ${LAB_REFUND * 100}%, sem indenização.` },
     { key: 'bill',   name: 'HOSPITAL',       desc: `Com paramédico o cliente segue a volta, mas você paga a conta: ${LAB_BILL * 100}% do valor de uma indenização.` },
     { key: 'flaky',  name: 'PLANTÃO FALHO',  desc: `Paramédico salva ${LAB_FLAKY * 100}% das vezes. No resto o cliente morre e a indenização sai pela metade.` },
   ] },
-  { key: 'decor', title: 'ENFEITES', options: [
+  { key: 'decor', title: 'ENFEITES', def: 'items', options: [
+    { key: 'items',  name: 'INVENTÁRIO',   desc: 'Itens saem de um mint próprio, ficam no inventário e são equipados nos slots de cada ilha, na aba ITENS (só no 3D). O item vale para os bonecos da ilha dele.' },
     { key: 'off',    name: 'SEM ENFEITES', desc: 'Nenhum enfeite no parque.' },
     { key: 'lots',   name: 'CANTEIROS',    desc: 'Canteiros fixos no mapa, marcados com +. O enfeite afeta os bonecos por perto.' },
     { key: 'acc',    name: 'NA VAGA',      desc: `Cada vaga aceita um enfeite, com efeito ${LAB_ACC_POWER}x maior, só naquele boneco. Clique no boneco para colocar.` },
     { key: 'global', name: 'NA ENTRADA',   desc: `Até ${LAB_GLOBAL_MAX} enfeites na entrada, valendo para o parque todo, com ${LAB_GLOBAL_POWER * 100}% da força.` },
   ] },
-  { key: 'track', title: 'TRILHO ESPECIAL', options: [
+  { key: 'track', title: 'TRILHO ESPECIAL', def: 'pads', options: [
+    { key: 'pads',  name: 'TURBO EM TRECHOS', desc: 'Compre trechos curtos de turbo (só no 3D). Quando o trem passa por um, acelera por alguns segundos. Pesa mais em voltas curtas.' },
     { key: 'off',   name: 'NORMAL',     desc: 'O trilho de hoje.' },
-    { key: 'turbo', name: 'TURBO',      desc: 'Carrinhos 40% mais rápidos, mais clientes por hora. +10% de infarto.' },
     { key: 'calm',  name: 'ACOLCHOADO', desc: 'Carrinhos 20% mais lentos, mas 45% menos infarto.' },
     { key: 'brake', name: 'FREIO DO SUSTO', desc: 'Acelera nas retas e quase para em cada boneco. Susto rende +20%, +15% de infarto.' },
     { key: 'volt',  name: 'ELÉTRICO',   desc: '+1 carrinho no trilho, cada um 8% mais lento.' },
   ] },
-  { key: 'maint', title: 'MANUTENÇÃO (VOLTAR AO JOGO)', options: [
+  { key: 'maint', title: 'MANUTENÇÃO (VOLTAR AO JOGO)', def: 'vomit', options: [
     { key: 'off',     name: 'NADA',    desc: 'O parque rende sozinho para sempre.' },
     { key: 'oil',     name: 'ÓLEO',    desc: 'O trilho enferruja e os carrinhos vão ficando lentos. Clique na lata de óleo perto da casa.' },
     { key: 'battery', name: 'BATERIA', desc: 'Cada boneco gasta bateria e desliga no zero. Clique nos que estão piscando.' },
     { key: 'coal',    name: 'CALDEIRA', desc: 'Com carvão o parque rende mais que o normal; vazia, bem menos. Cada clique põe 20%.' },
-    { key: 'vomit',   name: 'VÔMITO',  desc: 'Clientes sujam os carrinhos e pagam menos. Clique no carrinho andando para limpar.' },
+    { key: 'vomit',   name: 'VÔMITO',  desc: 'Clientes sujam os carrinhos e o parque vai ficando imundo. Quanto mais sujo, mais infarto. Clique no carrinho andando para limpar.' },
     { key: 'pact',    name: 'PACTO',   desc: 'Assine o pacto dentro do prazo. Cada renovação seguida dá +3% (até +30%). Se atrasar, os bonecos fazem greve.' },
   ] },
 ];
@@ -503,7 +515,7 @@ Object.assign(SPRITES, {
 });
 
 // ---------------- estado e regras ----------------
-const LAB_KEY = 'casaAssombrada.lab';
+const LAB_KEY = 'casaAssombrada.lab.v2';
 const LAB_ORIG = RARITIES.map(r => ({ roi: r.roi, roiNoMedic: r.roiNoMedic, heart: r.heart }));
 
 const Lab = {
@@ -515,7 +527,7 @@ const Lab = {
 
   // ---------- escolhas ----------
   loadPicks() {
-    LAB_SYSTEMS.forEach(s => { this.picks[s.key] = s.options[0].key; });
+    LAB_SYSTEMS.forEach(s => { this.picks[s.key] = s.def || s.options[0].key; });
     try {
       const d = JSON.parse(localStorage.getItem(LAB_KEY));
       if (d) {
@@ -544,9 +556,10 @@ const Lab = {
   setLook(item, n) { this.picks.looks[item] = n; this.savePicks(); Game.emit('change'); },
 
   freshState() {
-    return { map: { big: 0, islands: 0, bits: 0 }, decor: { lots: {}, acc: {}, global: [] }, maint: { clock: 0, oil: 0, coalLvl: 1, coalAt: 0, clean: {}, pactAt: 0, streak: 0 } };
+    return { map: { big: 0, islands: 0, bits: 0 }, isles3d: [], turbo: 0, items: { inv: {}, equip: {}, open: {} }, decor: { lots: {}, acc: {}, global: [] }, maint: { clock: 0, oil: 0, coalLvl: 1, coalAt: 0, clean: {}, pactAt: 0, streak: 0 } };
   },
   st() { return Game.s.lab; },
+  items() { const st = this.st(); return st.items || (st.items = { inv: {}, equip: {}, open: {} }); },
   dirty() { this._cache = null; },
 
   applyRarity() {
@@ -574,6 +587,7 @@ const Lab = {
     const next = this.nextLevel();
     if (!next || !Game.spend(next.cost)) return false;
     this.st().map[this.picks.map]++;
+    if (World.onBuyLevel) World.onBuyLevel(this.picks.map);
     this.dirty();
     World.rebuild();
     Game.emit('change');
@@ -583,6 +597,7 @@ const Lab = {
   dropLevel() {
     if (!this.mapLevel()) return;
     this.st().map[this.picks.map]--;
+    if (World.onDropLevel) World.onDropLevel(this.picks.map);
     this.dirty();
     World.rebuild();
     Game.emit('change');
@@ -596,18 +611,19 @@ const Lab = {
 
   // ---------- classes ----------
   scheme() { return LAB_CLASSES[this.picks.classes]; },
-  classKey(kind) {
+  classKeys(kind) {
     const sc = this.scheme();
-    return Object.keys(sc).find(k => sc[k].kinds.includes(kind));
+    return Object.keys(sc).filter(k => sc[k].kinds.includes(kind));
   },
-  classOf(m) { return this.scheme()[this.classKey(monOf(m).key)]; },
+  classOf(m) { return this.scheme()[this.classKeys(monOf(m).key)[0]]; },
+  classesOf(m) { return this.classKeys(monOf(m).key).map(k => this.scheme()[k]); },
 
   // ---------- bônus por vaga (classe, enfeites, ilha), recalculado só quando algo muda ----------
   buffs() { return this._cache || (this._cache = this.compute()); },
   compute() {
     const mons = {}, st = this.st(), rule = this.picks.classRule, links = [];
     Game.s.monsters.forEach(m => { if (m.slot >= 0) mons[m.slot] = m; });
-    const order = Game.slotOrder, entries = order.filter(i => mons[i]).map(i => ({ i, m: mons[i], cls: this.classKey(monOf(mons[i]).key), classAdd: 0, decorAdd: 0, perkAdd: 0, heart: 1 }));
+    const order = Game.slotOrder, entries = order.filter(i => mons[i]).map(i => ({ i, m: mons[i], cls: this.classKeys(monOf(mons[i]).key), classAdd: 0, decorAdd: 0, perkAdd: 0, heart: 1 }));
     const bySlot = {};
     entries.forEach(e => {
       bySlot[e.i] = e;
@@ -616,25 +632,27 @@ const Lab = {
     const slots = typeof World !== 'undefined' ? World.SLOTS : [];
     const dist = (a, b) => Math.hypot(slots[a].x - slots[b].x, (slots[a].y - slots[b].y) * 1.3);
     const color = c => this.scheme()[c].color;
+    const common = (a, b) => a.cls.find(c => b.cls.includes(c));
 
     if (rule === 'vizinho') {
       for (let k = 0; k + 1 < order.length; k++) {
         const a = bySlot[order[k]], b = bySlot[order[k + 1]];
-        if (a && b && a.cls === b.cls) { a.classAdd += LAB_NEIGHBOR; b.classAdd += LAB_NEIGHBOR; links.push([a.i, b.i, color(a.cls)]); }
+        const c = a && b && common(a, b);
+        if (c) { a.classAdd += LAB_NEIGHBOR; b.classAdd += LAB_NEIGHBOR; links.push([a.i, b.i, color(c)]); }
       }
     } else if (rule === 'sequencia') {
       let run = [];
       const close = () => {
         if (run.length >= 2) {
           const add = LAB_STREAK[Math.min(run.length, LAB_STREAK.length - 1)];
-          run.forEach((e, n) => { e.classAdd += add; if (n) links.push([run[n - 1].i, e.i, color(e.cls)]); });
+          run.forEach((e, n) => { e.classAdd += add; if (n) links.push([run[n - 1].i, e.i, color(common(run[n - 1], e))]); });
         }
         run = [];
       };
       order.forEach(i => {
         const e = bySlot[i];
         if (!e) { close(); return; }
-        if (run.length && run[0].cls !== e.cls) close();
+        if (run.length && !common(run[run.length - 1], e)) close();
         run.push(e);
       });
       close();
@@ -642,14 +660,15 @@ const Lab = {
       entries.forEach(e => { e.near = 0; });
       for (let a = 0; a < entries.length; a++) for (let b = a + 1; b < entries.length; b++) {
         const A = entries[a], B = entries[b];
-        if (A.cls !== B.cls || dist(A.i, B.i) > LAB_RADIUS) continue;
+        const c = common(A, B);
+        if (!c || dist(A.i, B.i) > LAB_RADIUS) continue;
         A.near++; B.near++;
-        links.push([A.i, B.i, color(A.cls)]);
+        links.push([A.i, B.i, color(c)]);
       }
       entries.forEach(e => {
         if (rule === 'raio') e.classAdd = Math.min(LAB_RADIUS_CAP, e.near * LAB_RADIUS_EACH);
         else {
-          const p = this.scheme()[e.cls].power, n = Math.min(LAB_POWER_CAP, e.near);
+          const p = this.scheme()[e.cls[0]].power, n = Math.min(LAB_POWER_CAP, e.near);
           e.classAdd = p.farm * n;
           e.heart *= Math.pow(p.heart, n);
         }
@@ -677,13 +696,23 @@ const Lab = {
         const it = LAB_ITEMS[key];
         entries.forEach(e => { e.decorAdd += it.farm * LAB_GLOBAL_POWER; e.heart *= weak(it.heart, LAB_GLOBAL_POWER); });
       });
+    } else if (mode === 'items' && World.ITEM_SLOTS) {
+      Object.entries(this.items().equip).forEach(([idx, key]) => {
+        const spot = World.ITEM_SLOTS[+idx], it = LAB_ITEMS[key];
+        if (!spot || !it) return;
+        entries.forEach(e => {
+          if (slots[e.i].isle === spot.isle) { e.decorAdd += it.farm * LAB_ITEM_POWER; e.heart *= weak(it.heart, LAB_ITEM_POWER); }
+        });
+      });
     }
 
     // bônus da ilha
     if (this.picks.map === 'islands') {
       entries.forEach(e => {
         const sl = slots[e.i], lvl = sl && sl.isle >= 0 ? LAB_MAP.islands.levels[sl.isle] : null;
-        if (lvl) { e.perkAdd = lvl.perk.farm; e.heart *= lvl.perk.heart; }
+        if (!lvl) return;
+        e.perkAdd = lvl.perk.farm; e.heart *= lvl.perk.heart;
+        if (lvl.favor && e.cls.includes(lvl.favor)) e.perkAdd += lvl.favorAdd;
       });
     }
     return { bySlot, entries, links, placed: entries.map(e => e.m) };
@@ -738,7 +767,12 @@ const Lab = {
     return Math.max(0, Math.min(1, (T - at) / this.period()));
   },
   dirt(color) { return this.picks.maint === 'vomit' ? this.dirtAt(color, this.clock()) : 0; },
-  cartFactor(color) { return 1 - LAB_VOMIT_LOSS * this.dirt(color); },
+  cartHeart(color) { return 1 + LAB_VOMIT_HEART * this.dirt(color); },
+  meanDirt(T) {
+    const colors = [0, 1, 2, 3].slice(0, Math.max(1, Math.min(4, Game.trainCount())));
+    return colors.reduce((a, c) => a + this.dirtAt(c, T), 0) / colors.length;
+  },
+  meanCartHeart() { return this.picks.maint === 'vomit' && !this._pristine ? 1 + LAB_VOMIT_HEART * this.meanDirt(this.clock()) : 1; },
   pactFactorAt(T) {
     const M = this.st().maint;
     return T - M.pactAt <= this.period() ? 1 + Math.min(LAB_PACT.cap, M.streak * LAB_PACT.streak) : LAB_PACT.strike;
@@ -754,21 +788,14 @@ const Lab = {
     return 1;
   },
   canScare(m) { return this.picks.maint !== 'battery' || this.battery(m) > 0; },
-  vomitFactor(T) {
-    if (this.picks.maint !== 'vomit' || this._pristine) return 1;
-    return this.vomitFactorAt(T === undefined ? this.clock() : T);
-  },
-  vomitFactorAt(T) {
-    const colors = [0, 1, 2, 3].slice(0, Math.max(1, Math.min(4, Game.trainCount())));
-    return colors.reduce((a, c) => a + 1 - LAB_VOMIT_LOSS * this.dirtAt(c, T), 0) / colors.length;
-  },
+
   // desgaste de 0 a 1, para a barra e o aviso
   wear() {
     const o = this.picks.maint, T = this.clock(), M = this.st().maint;
     if (o === 'oil') return this.oilWearAt(T);
     if (o === 'coal') return 1 - this.coalAt(T);
     if (o === 'pact') return Math.min(1, (T - M.pactAt) / this.period());
-    if (o === 'vomit') return (1 - this.vomitFactorAt(T)) / LAB_VOMIT_LOSS;
+    if (o === 'vomit') return this.meanDirt(T);
     if (o === 'battery') {
       const p = this.buffs().placed;
       return p.length ? 1 - p.reduce((a, m) => a + this.battery(m), 0) / p.length : 0;
@@ -784,7 +811,6 @@ const Lab = {
     }
     if (o === 'coal') return this.coalFactor(this.coalAt(T));
     if (o === 'pact') return this.pactFactorAt(T);
-    if (o === 'vomit') return this.vomitFactorAt(T);
     if (o === 'battery') {
       const p = this.buffs().placed;
       return p.length ? p.reduce((a, m) => a + this.batFactor(this.batteryAt(m, T)), 0) / p.length : 1;
@@ -837,7 +863,7 @@ const Lab = {
     let alive = 1, farm = 0, fees = 0, gross = 0, paid = 0;
     for (const m of this.buffs().placed) {
       if (!this.canScare(m) && !this._pristine) continue;
-      const rew = Game.rewardOf(m), h = this.heartOf(m), fee = Game.indemnityOf(RAR[m.rarity]);
+      const rew = Game.rewardOf(m), h = this.heartOf(m) * this.meanCartHeart(), fee = Game.indemnityOf(RAR[m.rarity]);
       gross += rew;
       farm += alive * rew;
       paid += rew;
@@ -850,8 +876,7 @@ const Lab = {
       else if (pol === 'bill') fees += alive * h * fee * LAB_BILL;
       else if (pol === 'flaky') { fees += alive * h * (1 - LAB_FLAKY) * fee * LAB_FLAKY_FEE; alive *= 1 - h * (1 - LAB_FLAKY); }
     }
-    const v = this.vomitFactor();
-    return { gross: gross * rps * v, farm: farm * rps * v, fees: fees * rps, net: (farm * v - fees) * rps, deaths: (1 - alive) * rps };
+    return { gross: gross * rps, farm: farm * rps, fees: fees * rps, net: (farm - fees) * rps, deaths: (1 - alive) * rps };
   },
   // devolve dinheiro ao cliente (sem dívida)
   takeBack(amount) {
@@ -979,11 +1004,20 @@ const LabUI = {
       <tr><th></th><th>$/DIA</th><th>ROI</th><th>SEM PARAM.</th><th>INFARTO</th></tr>
       ${RARITIES.map(r => `<tr style="--c:${r.color}"><td class="rn">${r.label}</td><td>${money(r.farm)}</td><td>${n2(r.roi)}d</td><td>${n2(r.roiNoMedic)}d</td><td>${+(r.heart * 100).toFixed(2)}%</td></tr>`).join('')}
     </table>
-    <p class="muted small">Um mint médio rende <b>${money(avg)} $MEDO/dia</b> e se paga em <b>${(CFG.mintCost / avg).toFixed(1)} dias</b>.</p>`;
+    <p class="muted small">Um mint médio rende <b>${money(avg)} $MEDO/dia</b> e se paga em <b>${(CFG.mintCost / avg).toFixed(1)} dias</b>.</p>
+    <table class="lab-table">
+      <tr><th></th><th>BONECOS</th><th>TOKENS/DIA</th><th>COM +50%</th><th>US$/DIA</th></tr>
+      ${[['Peixe', 8], ['Golfinho', 30], ['Baleia', 80]].map(([name, n]) => {
+        const tokens = n * avg * LAB_TOKENS_PER_MEDO;
+        return `<tr><td class="rn" style="--c:var(--text)">${name}</td><td>${n}</td><td>${Math.round(tokens / 1000)}k</td><td>${Math.round(tokens * 1.5 / 1000)}k</td><td>${(tokens * LAB_MCAP / LAB_SUPPLY).toFixed(0)}</td></tr>`;
+      }).join('')}
+    </table>
+    <p class="muted small">Estimativa com o mint médio, ${LAB_TOKENS_PER_MEDO} tokens por $MEDO e market cap de US$ ${LAB_MCAP / 1000}k. +50% é o bônus de classes, itens e ilhas.</p>`;
   },
 
   classBody() {
     const { pct } = this.h, sc = Lab.scheme(), rule = Lab.picks.classRule;
+    if (!sc) return '';
     const name = k => MON[k].short;
     return `<div class="lab-classes">${Object.values(sc).map(c => {
       const p = c.power, fx = rule === 'poderes' ? ` <span class="muted">(${p.farm ? '+' + pct(p.farm) + ' farm' : ''}${p.heart !== 1 ? (p.heart < 1 ? ' · ' + pct(1 - p.heart) + ' menos infarto' : ' · +' + pct(p.heart - 1) + ' infarto') : ''})</span>` : '';
@@ -1013,6 +1047,7 @@ const LabUI = {
     let extra = '';
     if (mode === 'lots') extra = `<p class="muted small">${Object.keys(st.lots).length} de ${World.LOTS.length} canteiros ocupados. Alcance: ${LAB_LOT_RADIUS} px.</p>`;
     if (mode === 'acc') extra = `<p class="muted small">${Object.keys(st.acc).length} enfeites presos em vagas.</p>`;
+    if (mode === 'items') extra = `<p class="muted small">${World.ITEM_SLOTS ? 'Mint, inventário e slots ficam na aba ITENS.' : 'Esta versão só funciona no jogo em 3D.'}</p>`;
     if (mode === 'global') extra = `<p class="muted small">${st.global.length} de ${LAB_GLOBAL_MAX} na entrada.</p>
       <div class="lab-items">${Object.entries(LAB_ITEMS).map(([k, it]) => `<div class="lab-item">${spr(Lab.lookSprite(k), 2)}<span><b>${it.name}</b><br><span class="muted small">${this.itemEffect(it)}</span></span>
         <span class="lab-item-btns"><button class="btn sm" data-act="labglobal" data-key="${k}" ${st.global.length < LAB_GLOBAL_MAX && Game.canAfford(it.cost) ? '' : 'disabled'}>+ ${Game.s.infinite ? 'GRÁTIS' : money(it.cost)}</button>${st.global.includes(k) ? `<button class="btn sm ghost" data-act="labglobalrm" data-key="${k}">-</button>` : ''}</span></div>`).join('')}</div>`;
@@ -1036,6 +1071,8 @@ const LabUI = {
       <div class="row-btns left"><button class="btn sm ghost" data-act="labage" data-v="0.9">GASTAR 90%</button><button class="btn sm ghost" data-act="labage" data-v="1.01">ESTRAGAR</button><button class="btn sm ghost" data-act="labfix">CONSERTAR TUDO</button></div>`;
   },
 
+  trackBody() { return World.trackPanel ? World.trackPanel() : ''; },
+
   summary() {
     return LAB_SYSTEMS.map(s => s.title + ': ' + s.options.find(o => o.key === Lab.picks[s.key]).name).concat(
       Object.entries(LAB_ITEMS).map(([k, it]) => 'Aparência ' + it.name + ': ' + Lab.look(k) + ' (' + it.looks[Lab.look(k) - 1] + ')'));
@@ -1043,27 +1080,33 @@ const LabUI = {
 
   render() {
     const { esc } = this.h;
-    return `
-      <p class="hint">Escolha uma versão de cada sistema. Vale na hora, no parque ao lado. O botão <b>$MEDO INFINITO</b> ajuda a testar as compras.</p>
-      ${this.card(1, 'map', this.mapBody())}
-      ${this.card(2, 'rarity', this.rarityBody())}
-      ${this.card(3, 'classRule', Lab.picks.classRule === 'off' ? '' : '<p class="muted small">No mapa, linhas coloridas ligam os bonecos que estão se ajudando.</p>')}
-      ${this.card(4, 'classes', this.classBody())}
-      ${this.card(5, 'heart', this.heartBody())}
-      ${this.card(6, 'decor', this.decorBody())}
-      ${this.card(7, 'track')}
-      ${this.card(8, 'maint', this.maintBody())}
-      <section class="lab-card px">
+    const list = [
+      ['map', 'MAPA', () => this.card(1, 'map', this.mapBody())],
+      ['rarity', 'RARIDADE', () => this.card(2, 'rarity', this.rarityBody())],
+      ['class', 'CLASSES', () => this.card(3, 'classRule', Lab.picks.classRule === 'off' ? '' : '<p class="muted small">No mapa, linhas coloridas ligam os bonecos que estão se ajudando.</p>') + this.card(4, 'classes', this.classBody())],
+      ['heart', 'INFARTO', () => this.card(5, 'heart', this.heartBody())],
+      ['decor', 'ENFEITES', () => this.card(6, 'decor', this.decorBody())],
+      ['track', 'TRILHO', () => this.card(7, 'track', this.trackBody())],
+      ['maint', 'MANUTENÇÃO', () => this.card(8, 'maint', this.maintBody())],
+      ['picks', 'ESCOLHAS', () => `<section class="lab-card px">
         <h4><span class="lab-n">✓</span>MINHAS ESCOLHAS</h4>
         <div class="lab-sum">${this.summary().map(esc).join('<br>')}</div>
         <div class="row-btns left"><button class="btn sm" data-act="labcopy">COPIAR ESCOLHAS</button><button class="btn sm ghost" data-act="labzero">ZERAR COMPRAS DO TESTE</button></div>
-      </section>`;
+      </section>`],
+    ].concat(World.labExtra || []);
+    // no 3D cada sistema abre sozinho, para o painel não virar uma lista enorme
+    if (World.labTabs) {
+      const cur = list.find(s => s[0] === this.sec) || list[0];
+      return `<div class="chips lab-secs">${list.map(s => `<button class="chip${s === cur ? ' on' : ''}" data-act="labsec" data-s="${s[0]}" style="--c:var(--gold)">${s[1]}</button>`).join('')}</div>${cur[2]()}`;
+    }
+    return `<p class="hint">Escolha uma versão de cada sistema. Vale na hora, no parque ao lado. O botão <b>$MEDO INFINITO</b> ajuda a testar as compras.</p>${list.map(s => s[2]()).join('')}`;
   },
 
   // devolve true se a ação era da aba
   act(a, d) {
     const { toast, refresh, closeModal, openSlot } = this.h, st = Lab.st();
     switch (a) {
+      case 'labsec': this.sec = d.s; refresh(); return true;
       case 'labpick': Lab.setPick(d.sys, d.opt); return true;
       case 'labup': if (Lab.buyLevel()) toast('Mapa expandido! Veja as vagas novas no mapa.', 'good'); return true;
       case 'labdown': Lab.dropLevel(); return true;
@@ -1105,7 +1148,7 @@ const LabUI = {
         toast('Expansões, enfeites e manutenção do teste foram zerados.', 'info');
         return true;
     }
-    return false;
+    return World.labAct ? World.labAct(a, d) : false;
   },
 
   openLot(i) {
@@ -1120,8 +1163,7 @@ const LabUI = {
   slotExtra(i, m) {
     const { spr, money, pct } = this.h, b = Lab.buffOf(m), parts = [];
     if (Lab.picks.classRule !== 'off') {
-      const c = Lab.classOf(m);
-      parts.push(`<p>Classe: <b style="color:${c.color}">${c.label}</b>${b && b.classAdd ? ` · <b class="gold">+${pct(b.classAdd)} de farm</b>` : ' · sem colegas por perto'}</p>`);
+      parts.push(`<p>Classe: ${Lab.classesOf(m).map(c => `<b style="color:${c.color}">${c.label}</b>`).join(' + ')}${b && b.classAdd ? ` · <b class="gold">+${pct(b.classAdd)} de farm</b>` : ' · sem colegas por perto'}</p>`);
     }
     if (b && b.decorAdd) parts.push(`<p class="muted">Enfeites: ${b.decorAdd > 0 ? '+' : ''}${pct(b.decorAdd)} de farm</p>`);
     if (b && b.perkAdd) parts.push(`<p class="muted">Ilha: +${pct(b.perkAdd)} de farm</p>`);
@@ -1136,12 +1178,11 @@ const LabUI = {
   // texto extra do balão do mapa
   tip(m) {
     if (Lab.picks.classRule === 'off') return '';
-    const c = Lab.classOf(m), b = Lab.buffOf(m);
-    return `<br><span style="color:${c.color}">${c.label}</span>${b && b.classAdd ? ` +${this.h.pct(b.classAdd)}` : ''}`;
+    const b = Lab.buffOf(m);
+    return `<br>${Lab.classesOf(m).map(c => `<span style="color:${c.color}">${c.label}</span>`).join(' + ')}${b && b.classAdd ? ` +${this.h.pct(b.classAdd)}` : ''}`;
   },
   classTag(m) {
     if (Lab.picks.classRule === 'off') return '';
-    const c = Lab.classOf(m);
-    return ` · <span style="color:${c.color}">${c.label}</span>`;
+    return ' · ' + Lab.classesOf(m).map(c => `<span style="color:${c.color}">${c.label}</span>`).join(' + ');
   },
 };

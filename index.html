@@ -133,7 +133,7 @@
 
   /* abas do painel */
   .p-tabs { display: flex; border-bottom: 2px solid var(--line); flex: none; }
-  .p-tabs button { flex: 1; font-family: var(--pixel); font-size: 9px; padding: 9px 4px; background: transparent; color: var(--muted); border: 0; cursor: pointer; }
+  .p-tabs button { flex: 1; font-family: var(--pixel); font-size: 8px; padding: 9px 2px; background: transparent; color: var(--muted); border: 0; cursor: pointer; }
   .p-tabs button:hover { color: var(--text); }
   .p-tabs button[aria-selected="true"] { color: var(--gold); box-shadow: inset 0 -3px 0 var(--orange); }
   .p-body[hidden] { display: none !important; }
@@ -145,6 +145,26 @@
   .lab-modal { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px; background: rgba(5, 3, 10, 0.72); }
   .lab-modal[hidden] { display: none; }
   .lab-modal-box { position: relative; width: min(420px, 100%); max-height: 85vh; overflow-y: auto; padding: 16px; }
+
+  /* sujeira: as bordas da tela ficam esverdeadas conforme os carrinhos sujam */
+  #grime { position: fixed; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at center, rgba(90, 130, 40, 0) 40%, rgba(90, 130, 40, 0.6) 100%); }
+  /* o que está no carrinho e ainda vai cair na carteira */
+  .carry { padding: 10px 16px; border-bottom: 2px solid var(--line); flex: none; }
+  .carry-top { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--pixel); font-size: 9px; color: var(--muted); }
+  .carry-top b { font-size: 12px; font-weight: 400; color: var(--gold); }
+  .carry-bar { height: 8px; margin: 6px 0; background: #0d0a17; border: 2px solid #05030a; }
+  .carry-bar i { display: block; height: 100%; width: 0; background: var(--orange); }
+  .bal { transform-origin: left center; }
+  .bal.pay { animation: payflash 0.7s steps(4); }
+  @keyframes payflash { 0% { transform: scale(1.25); color: #fff; } 100% { transform: scale(1); } }
+  .roster { overflow-y: auto; max-height: 46vh; }
+  .lab-secs { margin-bottom: 10px; }
+  .item-row { display: grid; grid-template-columns: 32px 1fr auto; gap: 6px; align-items: center; font-size: 17px; line-height: 1.05; }
+  .item-list { display: flex; flex-direction: column; gap: 4px; }
+  .item-slots { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .item-slot { width: 44px; height: 44px; display: grid; place-items: center; background: #0d0a17; border: 2px dashed var(--line); padding: 0; color: var(--muted); font-size: 16px; cursor: default; }
+  .item-slot.full { border-style: solid; border-color: var(--gold); cursor: pointer; }
+  .item-slot.locked { opacity: 0.35; }
 
   /* aba TESTE (conteúdo gerado por js/lab.js) */
   #labBody { padding-top: 12px; gap: 10px; }
@@ -216,6 +236,7 @@
 <body>
 <canvas id="sky" width="480" height="270" aria-hidden="true"></canvas>
 <canvas id="view" aria-label="Parque 3D: uma ilha flutuante à noite com a casa assombrada, o trem fantasma dando a volta e bonecos assustando os visitantes"></canvas>
+<div id="grime" aria-hidden="true"></div>
 
 <header class="sign plate">
   <div>
@@ -239,15 +260,34 @@
     </div>
     <button class="btn toggle" id="toggle" aria-expanded="false" aria-controls="pbody">PAINEL</button>
   </div>
+  <div class="carry">
+    <div class="carry-top"><span>NO CARRINHO</span><b id="carry">+0,000</b></div>
+    <div class="carry-bar"><i id="carryBar"></i></div>
+    <p class="note">Cada susto enche o carrinho. O $MEDO cai na carteira quando ele chega na casa.</p>
+  </div>
   <nav class="p-tabs" aria-label="Abas do painel">
-    <button id="tabPark" aria-selected="true">PARQUE</button>
+    <button id="tabMons" aria-selected="true">BONECOS</button>
+    <button id="tabItems" aria-selected="false">ITENS</button>
+    <button id="tabPark" aria-selected="false">PARQUE</button>
     <button id="tabLab" aria-selected="false">TESTE</button>
   </nav>
+  <div class="p-body" id="monsBody">
+    <section class="sec">
+      <h2>CRIPTA DE INVOCAÇÃO</h2>
+      <button class="btn primary" id="mintBtn">MINTAR BONECO</button>
+      <p class="note" id="mintNote"></p>
+    </section>
+    <section class="sec">
+      <h2>NA PISTA</h2>
+      <ul class="roster" id="roster"></ul>
+    </section>
+  </div>
+  <div class="p-body labroot" id="itemsBody" hidden><div id="itemsPanel"></div></div>
   <div class="p-body labroot" id="labBody" hidden>
     <button class="btn" id="btnInfinite">$MEDO INFINITO: DESLIGADO</button>
     <div id="labPanel"></div>
   </div>
-  <div class="p-body" id="pbody">
+  <div class="p-body" id="pbody" hidden>
     <section class="sec">
       <h2>PARAMÉDICOS</h2>
       <button class="btn medic" id="medicBtn" aria-pressed="false">✚ SEM PARAMÉDICOS</button>
@@ -261,30 +301,6 @@
         <button class="btn" data-mult="12" aria-pressed="false">×12</button>
       </div>
       <p class="note" id="multNote"></p>
-    </section>
-    <section class="sec">
-      <h2>CRIPTA DE INVOCAÇÃO</h2>
-      <button class="btn primary" id="mintBtn">MINTAR BONECO</button>
-      <p class="note" id="mintNote"></p>
-    </section>
-    <section class="sec">
-      <h2>NA PISTA</h2>
-      <ul class="roster" id="roster"></ul>
-    </section>
-    <section class="sec">
-      <h2>PLACAR</h2>
-      <dl class="tt">
-        <dt>Sustos</dt><dd id="sScares">0</dd>
-        <dt>Infartos</dt><dd id="sHearts">0</dd>
-        <dt>Salvos no choque</dt><dd id="sSaved">0</dd>
-        <dt>Mortes</dt><dd id="sDeaths">0</dd>
-        <dt>Indenizações pagas</dt><dd id="sPaid">0,000</dd>
-        <dt>Voltas do trem</dt><dd id="sLaps">0</dd>
-      </dl>
-    </section>
-    <section class="sec">
-      <h2>DIÁRIO DO PARQUE</h2>
-      <ol class="log" id="log" aria-live="polite"></ol>
     </section>
     <section class="sec">
       <h2>VISÃO</h2>
@@ -354,6 +370,7 @@
 <script src="js/sprites.js"></script>
 <script src="js/state.js"></script>
 <script src="js/lab.js"></script>
+<script src="js/voxels.js"></script>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
@@ -541,11 +558,6 @@ const MAP3D = {
     { at: [-15, 0], c: [-28, 0],  rOut: 8,   rT: 11, land: [13, 15.5] },
     { at: [15, 3],  c: [28, 3],   rOut: 8.5, rT: 12, land: [13.5, 16.5] },
   ],
-  islands: [
-    { at: [-15, 0], c: [-40, 0],  rOut: 7.5, rT: 10,   land: [13, 14.5] },
-    { at: [-1, 13], c: [-1, 39],  rOut: 7.5, rT: 11.5, land: [15.5, 12.5] },
-    { at: [15, 3],  c: [40, 3],   rOut: 8,   rT: 10.5, land: [13, 14.5] },
-  ],
   bits: [
     { at: [-8, 13], c: [-8, 21.5], rOut: 4.8, rT: 6,   land: [9, 8] },
     { at: [-15, 5], c: [-24, 5],   rOut: 5.2, rT: 7,   land: [8.5, 10] },
@@ -553,15 +565,67 @@ const MAP3D = {
     { at: [15, 5],  c: [24.5, 5],  rOut: 5.2, rT: 7,   land: [8.5, 10] },
   ],
 };
+// OUTRAS ILHAS: grade 3x3 com a ilha principal na posição 2 (no alto, no meio). Cada compra sorteia a
+// raridade (tamanho e vagas) e o tipo (a classe favorecida). Espaçadas e meio tortas, ligadas por pontes.
+const ISLE_RARITY = {
+  comum:    { weight: 60, label: 'COMUM',    land: [11, 9.5], rOut: 6.4, rT: 5.4, slots: 3,  items: 2, favor: 0.1 },
+  rara:     { weight: 30, label: 'RARA',     land: [15, 13],  rOut: 9.6, rT: 8.2, slots: 6,  items: 3, favor: 0.18 },
+  lendaria: { weight: 10, label: 'LENDÁRIA', land: [RX, RZ],  rOut: 14,  rT: 12,  slots: 10, items: 6, favor: 0.3 },
+};
+const ISLE_TYPES = [
+  { name: 'Cemitério', favor: 'morte',    tombs: 2.4, grass: ['#2c3a34', '#34423a', '#26322d', '#3a4a3e'], dead: ['#3e4238', '#4a4e42', '#34382f'] },
+  { name: 'Névoa',     favor: 'alem',     tombs: 0.8, grass: ['#3a4a66', '#42547a', '#34425c', '#4a5c82'], dead: ['#4a5470', '#566080', '#3e4860'] },
+  { name: 'Matadouro', favor: 'sangue',   tombs: 0.6, grass: ['#4a1f24', '#55262a', '#3e1a1e', '#622c30'], dead: ['#3a1a1c', '#4a2224', '#2e1416'] },
+  { name: 'Parquinho', favor: 'infancia', tombs: 0.2, grass: ['#5a4a7a', '#6a5a2e', '#2e6a6a', '#7a3f5c'], dead: ['#4a3a5a', '#54482a', '#284e50'] },
+  { name: 'Pântano',   favor: 'fera',     tombs: 0.4, grass: ['#1f3a2c', '#25442f', '#1a3226', '#2a4a30'], dead: ['#3a4a2a', '#45502e', '#2e3d24'] },
+  { name: 'Estúdio',   favor: 'filme',    tombs: 0.3, grass: ['#3a2a5c', '#44316a', '#322450', '#4e3878'], dead: ['#2e2248', '#38285a', '#281d3e'] },
+  { name: 'Servidor',  favor: 'lenda',    tombs: 0.2, grass: ['#10302c', '#143a34', '#0c2622', '#184a42'], dead: ['#0e2a30', '#123438', '#0a2024'] },
+];
+const ISLE_COST = [4000, 7000, 11000, 16000, 22000, 30000, 40000, 55000];
+const ISLE_ORDER = [1, 3, 5, 4, 6, 8, 7, 9], ISLE_PARENT = { 1: 2, 3: 2, 5: 2, 4: 5, 6: 5, 8: 5, 7: 8, 9: 8 };
+const ISLE_GRID = { 1: [-1, 0], 2: [0, 0], 3: [1, 0], 4: [-1, 1], 5: [0, 1], 6: [1, 1], 7: [-1, 2], 8: [0, 2], 9: [1, 2] };
+// colunas e linhas seguem a tela: com a câmera em 45 graus, a grade fica na diagonal do mundo
+const gridPos = (pos, jx, jz) => {
+  const [c, r] = ISLE_GRID[pos], sx = c * 66 + (r % 2 ? 11 : 0), sy = r * 64;
+  return [(sx + sy) / Math.SQRT2 + jx, (sy - sx) / Math.SQRT2 + jz];
+};
+const islesSt = Game.s.lab.isles3d || (Game.s.lab.isles3d = []);
+Game.s.lab.map.islands = islesSt.length;
+LAB_MAP.islands = {
+  noun: 'ILHA',
+  levels: ISLE_COST.map((cost, i) => {
+    const it = islesSt[i];
+    if (!it) return { cost, lobe: { slots: '3 a 10' } };
+    const R = ISLE_RARITY[it.rarity], T = ISLE_TYPES[it.type], cls = LAB_CLASSES.medos[T.favor];
+    return { name: `${T.name} ${R.label.toLowerCase()}`, cost, lobe: { slots: R.slots }, perk: { farm: 0, heart: 1 }, favor: T.favor, favorAdd: R.favor, perkText: `+${Math.round(R.favor * 100)}% para ${cls.label}` };
+  }),
+};
 const MAP_MODE = Lab.picks.map;
-const PLAN = MAP_MODE === 'off' ? [] : MAP3D[MAP_MODE].slice(0, Lab.mapLevel());
 const ISLES = MAP_MODE === 'islands';
+const PLAN = (() => {
+  if (MAP_MODE === 'off') return [];
+  if (!ISLES) return MAP3D[MAP_MODE].slice(0, Lab.mapLevel()).map((lo, n) => ({ ...lo, slots: LAB_MAP[MAP_MODE].levels[n].lobe.slots }));
+  const centers = { 2: [0, 0] }, sizes = { 2: 12 };
+  return islesSt.map((it) => {
+    const R = ISLE_RARITY[it.rarity], c = gridPos(it.pos, it.jx, it.jz), par = ISLE_PARENT[it.pos], pc = centers[par];
+    centers[it.pos] = c; sizes[it.pos] = (R.rOut + R.rT) / 2;
+    const l = Math.hypot(c[0] - pc[0], c[1] - pc[1]) || 1, reach = sizes[par];
+    return { c, at: [pc[0] + ((c[0] - pc[0]) / l) * reach, pc[1] + ((c[1] - pc[1]) / l) * reach], rOut: R.rOut, rT: R.rT, land: R.land, slots: R.slots, items: R.items, type: ISLE_TYPES[it.type], bow: it.bow, ph: it.ph, pos: it.pos };
+  });
+})();
 // a câmera se afasta para caber o que foi comprado
 let mapBox = { x0: -RX, x1: RX, z0: -RZ, z1: RZ };
 for (const lo of PLAN) {
   mapBox = { x0: Math.min(mapBox.x0, lo.c[0] - lo.land[0]), x1: Math.max(mapBox.x1, lo.c[0] + lo.land[0]), z0: Math.min(mapBox.z0, lo.c[1] - lo.land[1]), z1: Math.max(mapBox.z1, lo.c[1] + lo.land[1]) };
 }
 const MAP_S = Math.max(1, Math.hypot(mapBox.x1 - mapBox.x0, mapBox.z1 - mapBox.z0) / Math.hypot(RX * 2, RZ * 2));
+// tamanho do mapa como aparece na tela (a câmera olha em 45 graus): é o que decide o enquadramento
+const mapView = (() => {
+  const all = [{ x: 0, z: 0, r: RX }, ...PLAN.map((lo) => ({ x: lo.c[0], z: lo.c[1], r: Math.max(...lo.land) }))];
+  const us = all.flatMap((a) => { const u = (a.x - a.z) / Math.SQRT2; return [u - a.r, u + a.r]; }), vs = all.flatMap((a) => { const v = (a.x + a.z) / Math.SQRT2; return [v - a.r, v + a.r]; });
+  const u0 = Math.min(...us), u1 = Math.max(...us), v0 = Math.min(...vs), v1 = Math.max(...vs), cu = (u0 + u1) / 2, cv = (v0 + v1) / 2;
+  return { halfU: (u1 - u0) / 2, halfV: (v1 - v0) / 2, x: (cu + cv) / Math.SQRT2, z: (cv - cu) / Math.SQRT2 };
+})();
 cam.far = 175 * MAP_S;
 scene.fog.near = 96 * MAP_S; scene.fog.far = 142 * MAP_S;
 
@@ -588,12 +652,20 @@ const BASE_TRACK = (() => {
   const pts = [], N = 900;
   for (let i = 0; i < N; i++) {
     const t = (i / N) * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
-    pts.push([TA * Math.sign(c) * Math.pow(Math.abs(c), 0.4), TB * Math.sign(s) * Math.pow(Math.abs(s), 0.4)]);
+    const px = TA * Math.sign(c) * Math.pow(Math.abs(c), 0.4), pz = TB * Math.sign(s) * Math.pow(Math.abs(s), 0.4), pr = Math.hypot(px, pz) || 1;
+    // o trilho serpenteia; perto da casa e da estação continua reto
+    const wave = (Math.sin(t * 3 + 0.6) * 1.25 + Math.sin(t * 5 + 2.1) * 0.7) * clamp((pz + 7) / 5, 0, 1);
+    pts.push([px + (px / pr) * wave, pz + (pz / pr) * wave]);
   }
   // a lista começa atrás da casa, longe de onde os laços novos saem
   const k = nearestIdx(pts, 0, -TB);
   return trackInfo(pts.slice(k).concat(pts.slice(0, k)));
 })();
+// volta do laço em torno do centro, com ondas para não parecer uma elipse perfeita
+function lobePoint(lo, f) {
+  const k = 1 + 0.11 * Math.sin(f * 3 + (lo.ph || 0)) + 0.06 * Math.sin(f * 5 + 1 + (lo.ph || 0));
+  return [lo.c[0] + lo.dx * lo.rOut * k * Math.cos(f) + lo.tx * lo.rT * k * Math.sin(f), lo.c[1] + lo.dz * lo.rOut * k * Math.cos(f) + lo.tz * lo.rT * k * Math.sin(f)];
+}
 // insere um laço por expansão: o trilho sai pelo "pescoço", contorna o centro e volta ao mesmo ponto
 function attachLobes(base) {
   let pts = base;
@@ -608,12 +680,12 @@ function attachLobes(base) {
     Object.assign(lo, { dx, dz, tx, tz });
     const f0 = 0.75, n = Math.max(8, Math.ceil(Math.PI * (lo.rOut + lo.rT) / 3.2)), loop = [];
     for (let i = 0; i < n; i++) {
-      const f = lerp(-(Math.PI - f0), Math.PI - f0, i / (n - 1));
-      loop.push([lo.c[0] + dx * lo.rOut * Math.cos(f) + tx * lo.rT * Math.sin(f), lo.c[1] + dz * lo.rOut * Math.cos(f) + tz * lo.rT * Math.sin(f)]);
+      loop.push(lobePoint(lo, lerp(-(Math.PI - f0), Math.PI - f0, i / (n - 1))));
     }
+    // as duas pistas da ponte curvam para o mesmo lado, sem se encostar
     const neck = (P, Q) => {
-      const out = [], m = Math.ceil(Math.hypot(Q[0] - P[0], Q[1] - P[1]) / 3.2);
-      for (let i = 1; i < m; i++) out.push([lerp(P[0], Q[0], i / m), lerp(P[1], Q[1], i / m)]);
+      const out = [], m = Math.ceil(Math.hypot(Q[0] - P[0], Q[1] - P[1]) / 3.2), bow = lo.bow || 0;
+      for (let i = 1; i < m; i++) { const u = i / m, b = Math.sin(Math.PI * u) * bow; out.push([lerp(P[0], Q[0], u) + tx * b, lerp(P[1], Q[1], u) + tz * b]); }
       return out;
     };
     const ctrl = [pts[a2], pts[a1], A, ...neck(A, loop[0]), ...loop, ...neck(loop[n - 1], B), B, pts[b1], pts[b2]];
@@ -669,10 +741,9 @@ for (let i = 0; i < SLOT_N; i++) {
 }
 // vagas novas: por dentro de cada laço comprado
 PLAN.forEach((lo, n) => {
-  const count = LAB_MAP[MAP_MODE].levels[n].lobe.slots, f0 = 0.75;
+  const count = lo.slots, f0 = 0.75;
   for (let k = 0; k < count; k++) {
-    const f = lerp(-(Math.PI - f0) + 0.4, Math.PI - f0 - 0.4, (k + 0.5) / count);
-    const x = lo.c[0] + lo.dx * lo.rOut * Math.cos(f) + lo.tx * lo.rT * Math.sin(f), z = lo.c[1] + lo.dz * lo.rOut * Math.cos(f) + lo.tz * lo.rT * Math.sin(f);
+    const f = lerp(-(Math.PI - f0) + 0.4, Math.PI - f0 - 0.4, (k + 0.5) / count), [x, z] = lobePoint(lo, f);
     const il = Math.hypot(lo.c[0] - x, lo.c[1] - z) || 1, nx = (lo.c[0] - x) / il, nz = (lo.c[1] - z) / il;
     slots.push({ i: slots.length, d: dOnLap(x, z), x: x + nx * 2.15, z: z + nz * 2.15, nx, nz, mon: null, minting: null, isle: n });
   }
@@ -681,7 +752,7 @@ Game.slotOrder = slots.slice().sort((a, b) => a.d - b.d).map((s) => s.i);
 CFG.slots = slots.length;
 Game.trackLen = LAP * 10;   // na conta do Game, CFG.speed (40) equivale a VMAX (4) aqui
 
-const G = PLAN.length ? 62 : 24, GW = G * 2;
+const G = PLAN.length ? 190 : 24, GW = G * 2;
 const grid = new Array(GW * GW).fill(null);
 const cellAt = (x, z) => {
   const gx = Math.floor(x) + G, gz = Math.floor(z) + G;
@@ -712,17 +783,11 @@ const C = {
   soil: '#2b1d1d',
   rock: ['#2b1b45', '#3a2d5c', '#241638'],
 };
-// cada ilha comprada tem o chão de uma cor: pântano, ossuário e estúdio
-const ISLE_C = [
-  { grass: ['#1f3a2c', '#25442f', '#1a3226', '#2a4a30'], dead: ['#3a4a2a', '#45502e', '#2e3d24'] },
-  { grass: ['#5a5244', '#665c4a', '#4e473b', '#6e6450'], dead: ['#4a4438', '#565040', '#3e382e'] },
-  { grass: ['#3a2a5c', '#44316a', '#322450', '#4e3878'], dead: ['#2e2248', '#38285a', '#281d3e'] },
-];
 for (const c of grid) {
   if (!c) continue;
   const { x, z } = c;
   const bottom = -(2.2 + 11.5 * Math.pow(clamp(1 - c.d, 0, 1), 0.85) + vnoise(x * 0.45 + 11, z * 0.45 + 2) * 2.4);
-  T.box(x, -0.3, z, 1, 0.3, 1, pick((c.isle >= 0 && ISLE_C[c.isle][c.type]) || C[c.type]), 0, c.type === 'grass' || c.type === 'dead' ? 0.08 : 0.05);
+  T.box(x, -0.3, z, 1, 0.3, 1, pick((c.isle >= 0 && PLAN[c.isle].type[c.type]) || C[c.type]), 0, c.type === 'grass' || c.type === 'dead' ? 0.08 : 0.05);
   T.box(x, -1.0, z, 1, 0.7, 1, pick(C.side), 0, 0.05);
   const soilB = Math.max(bottom, -2.2);
   if (soilB < -1.0) T.box(x, soilB, z, 1, -1.0 - soilB, 1, C.soil, 0, 0.04);
@@ -733,7 +798,7 @@ for (const c of grid) {
 /* ---------- track ---------- */
 const trackRot = (p) => Math.atan2(-p.tz, p.tx);
 // trilho especial (aba TESTE): troca as cores dos dormentes e dos trilhos
-const TS = Lab.trackStats(), plainTrack = Lab.picks.track === 'off';
+const TS = Lab.trackStats(), plainTrack = Lab.picks.track === 'off' || Lab.picks.track === 'pads';
 const Rl = new Builder();
 let tieN = 0;
 for (let s = 0; s < LAP; s += 0.6) {
@@ -958,6 +1023,16 @@ const LOTS = [];
 }
 const GSPOTS = [[1.5, -7.6], [3.8, -6.2], [-2.6, -7.4]].map(([x, z]) => findSpot(x, z)).filter(Boolean);
 const PROP = findSpot(-6.5, -8.2);
+// slots de item: espalhados pela ilha; a principal tem 6, as compradas dependem da raridade
+const ITEM_SLOTS = [];
+const itemSpots = (cx, cz, r, n, isle) => {
+  for (let k = 0; k < n; k++) {
+    const a = (k / n) * Math.PI * 2 + 0.4, p = findSpot(cx + Math.cos(a) * r, cz + Math.sin(a) * r);
+    if (p) ITEM_SLOTS.push({ i: ITEM_SLOTS.length, x: p.x, z: p.z, isle });
+  }
+};
+itemSpots(0, 1, 8, 6, -1);
+PLAN.forEach((lo, n) => { if (lo.items) itemSpots(lo.c[0], lo.c[1], (lo.rOut + Math.min(...lo.land)) / 2, lo.items, n); });
 const tombs = [];
 function tomb(x, z, ry) {
   const col = pick(['#6b6785', '#8b87a6', '#5a5575', '#4a4662']);
@@ -1016,7 +1091,7 @@ for (let i = 0; i < 3000 && (trees < 13 || pumps < 18); i++) {
 }
 // terra comprada também ganha cemitério, árvores e abóboras
 for (const lo of PLAN) {
-  const [rx, rz] = lo.land, wantTombs = Math.round((rx * rz) / 16);
+  const [rx, rz] = lo.land, wantTombs = Math.round(((rx * rz) / 16) * (lo.type ? lo.type.tombs : 1));
   let tb = 0, tr = 0, pu = 0;
   for (let i = 0; i < 900 && (tb < wantTombs || tr < 4 || pu < 5); i++) {
     const x = lo.c[0] + rr(-rx, rx), z = lo.c[1] + rr(-rz, rz);
@@ -1152,7 +1227,7 @@ function seatRider(g, seat) {
 const carts = Array.from({ length: CART_N }, (_, i) => makeCart(i === 0, i));
 headlight.position.set(1.3, 0.8, 0);
 carts[0].g.add(headlight);
-const train = { dist: 0, v: 0, state: 'boarding', wait: 2.5, laps: 0, lapGain: 0 };
+const train = { dist: 0, v: 0, state: 'boarding', wait: 2.5, laps: 0, carry: 0, boost: 0 };
 function placeTrain() {
   carts.forEach((c, i) => {
     const s = STOP_S + train.dist - OFFS[i], a = trackAt(s + 0.7), b = trackAt(s - 0.7);
@@ -1171,7 +1246,7 @@ scene.add(partMesh);
 const parts = [];
 const COL = {
   smoke: new THREE.Color('#4a4662'), zap: new THREE.Color('#ffd23f'), zap2: new THREE.Color('#fff3a6'),
-  soul: new THREE.Color('#5ff5ff'), bat: new THREE.Color('#3a2d5c'), wisp: new THREE.Color('#7a3fc0'), red: new THREE.Color('#e0303c'), puff: new THREE.Color('#8b87a6'),
+  vomit: new THREE.Color('#a8d84a'), soul: new THREE.Color('#5ff5ff'), bat: new THREE.Color('#3a2d5c'), wisp: new THREE.Color('#7a3fc0'), red: new THREE.Color('#e0303c'), puff: new THREE.Color('#8b87a6'),
 };
 function emit(x, y, z, vx, vy, vz, life, size, col, grav = 0) {
   if (parts.length >= PART_MAX) parts.shift();
@@ -1227,8 +1302,26 @@ function monTex(kind, scared) {
 // (o miolo estufa e a borda fica fina). Vale para todos os personagens e para o quadro de susto (_s)
 const VOX = TEXEL;
 const voxCache = new Map();
+const quadCol = new Map();
+function quadsGeo(quads) {
+  const P2 = [], N2 = [], C2 = [];
+  for (const q of quads) {
+    if (!quadCol.has(q.c)) quadCol.set(q.c, new THREE.Color(q.c));
+    const c = quadCol.get(q.c);
+    for (const p of q.pts) { P2.push(p[0], p[1], p[2]); N2.push(q.n[0], q.n[1], q.n[2]); C2.push(c.r, c.g, c.b); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(P2, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(N2, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(C2, 3));
+  g.computeBoundingSphere(); g.computeBoundingBox();
+  return g;
+}
 function voxelGeo(name) {
   if (voxCache.has(name)) return voxCache.get(name);
+  // boneco com modelo próprio (js/voxels.js) no lugar do desenho 2D com volume
+  const modelQuads = voxelModelQuads(name);
+  if (modelQuads) { const mg = quadsGeo(modelQuads); voxCache.set(name, mg); return mg; }
   const rows = SPRITES[name], h = rows.length, w = Math.max(...rows.map((r) => r.length));
   const colAt = (i, j) => { const ch = rows[j][i]; return ch && ch !== '.' && PAL[ch] ? PAL[ch] : null; };
   const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -1258,6 +1351,104 @@ function voxelGeo(name) {
   voxCache.set(name, g);
   return g;
 }
+/* ---------- geleca translúcida (personagem original) ---------- */
+// Corpo liso de gelatina, com casca brilhante e uma caveira boiando dentro. Duas passadas transparentes
+// (fundo e frente) dão a sensação de volume sem precisar de reflexo de verdade.
+const GELECA_H = 2.5;
+const gelecaGeo = (() => {
+  const g = new THREE.SphereGeometry(1, 72, 54), p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), y = p.getY(i), z = p.getZ(i), t = (y + 1) / 2, a = Math.atan2(z, x);
+    const skirt = 1 + 0.42 * Math.exp(-((t / 0.2) ** 2));
+    const k = 0.82 * skirt + 0.045 * Math.sin(t * 26 + a * 2) * Math.pow(1 - t, 1.5) + 0.07 * Math.sin(a * 3 + 1.1) * (1 - t) ** 2;
+    const h = GELECA_H * Math.pow(t, 0.85) + 0.1 * Math.max(0, Math.cos(a * 4)) * t ** 8;
+    p.setXYZ(i, x * k, h, z * k);
+  }
+  g.computeVertexNormals();
+  g.rotateY(-Math.PI / 2);   // a emenda da esfera fica nas costas
+  return g;
+})();
+const JELLY_VS = `
+  uniform float uTime; uniform float uPh; uniform float uSq;
+  varying vec3 vN; varying vec3 vP;
+  void main(){
+    vec3 p = position; float t = clamp(p.y / ${GELECA_H.toFixed(1)}, 0.0, 1.0);
+    p += normal * (sin(uTime * 2.3 + uPh + p.y * 2.4) * 0.035 * t + sin(uTime * 3.7 + uPh + p.x * 3.0 + p.z * 2.0) * 0.018);
+    float sq = sin(uTime * 2.3 + uPh) * 0.04 + uSq;
+    p.y *= 1.0 + sq; p.xz *= 1.0 - sq * 0.55 * (0.4 + 0.6 * t);
+    vN = normalize(normalMatrix * normal); vP = p;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+  }`;
+const JELLY_FS = `
+  uniform vec3 uDeep; uniform vec3 uMid; uniform vec3 uRim; uniform float uBack;
+  varying vec3 vN; varying vec3 vP;
+  void main(){
+    vec3 V = vec3(0.0, 0.0, 1.0), N = normalize(vN) * (gl_FrontFacing ? 1.0 : -1.0);
+    float nv = clamp(dot(N, V), 0.0, 1.0), fr = pow(1.0 - nv, 2.4), t = clamp(vP.y / ${GELECA_H.toFixed(1)}, 0.0, 1.0);
+    vec3 col = mix(uDeep, uMid, smoothstep(0.15, 0.95, t * 0.6 + nv * 0.5));
+    col = mix(col, uRim, fr * 0.85);
+    float s1 = pow(max(dot(N, normalize(normalize(vec3(-0.5, 0.75, 0.6)) + V)), 0.0), 90.0);
+    float s2 = pow(max(dot(N, normalize(normalize(vec3(0.7, 0.25, 0.5)) + V)), 0.0), 34.0) * 0.35;
+    col = mix(col, vec3(1.0, 0.86, 0.95), smoothstep(0.12, 0.0, t) * 0.4);
+    col += s1 * 1.4 + s2;
+    float a = mix(0.5, 0.95, fr) + s1 * 0.5;
+    gl_FragColor = vec4(col, clamp(a * mix(1.0, 0.55, uBack), 0.0, 1.0));
+    #include <colorspace_fragment>
+  }`;
+const JELLY_C = { uDeep: new THREE.Color('#7a1fa8'), uMid: new THREE.Color('#ff5fbf'), uRim: new THREE.Color('#ffc4ee') };
+const skullGeo = quadsGeo(voxelPartQuads(modelJellySkull, 0.07)), jawGeo = quadsGeo(voxelPartQuads(modelJellyJaw, 0.07));
+const bubbleGeo = new THREE.SphereGeometry(1, 10, 8), bubbleMat = new THREE.MeshBasicMaterial({ color: 0xffd6f4, transparent: true, opacity: 0.7, fog: false });
+function makeGeleca(scared) {
+  const g = new THREE.Group(), ph = Math.random() * 6.28;
+  const skull = new THREE.Group(), head = new THREE.Mesh(skullGeo, matMon), jaw = new THREE.Mesh(jawGeo, matMon);
+  skull.add(head, jaw); skull.position.set(0, 0.8, 0.05);
+  head.position.y = 0.14; jaw.position.set(0, scared ? -0.06 : 0.03, 0.02);
+  g.add(skull);
+  const layer = (side, back, order) => {
+    const m = new THREE.Mesh(gelecaGeo, new THREE.ShaderMaterial({
+      vertexShader: JELLY_VS, fragmentShader: JELLY_FS, transparent: true, side, depthWrite: !back, fog: false,
+      uniforms: { uTime: U.time, uPh: { value: ph }, uSq: { value: scared ? 0.2 : 0 }, uBack: { value: back ? 1 : 0 }, uDeep: { value: JELLY_C.uDeep }, uMid: { value: JELLY_C.uMid }, uRim: { value: JELLY_C.uRim } },
+    }));
+    m.layers.set(1); m.renderOrder = order;
+    g.add(m);
+    return m;
+  };
+  layer(THREE.BackSide, true, 5);
+  layer(THREE.FrontSide, false, 6).castShadow = true;
+  const bubbles = Array.from({ length: 7 }, (_, i) => {
+    const m = new THREE.Mesh(bubbleGeo, bubbleMat);
+    m.layers.set(1); m.renderOrder = 4;
+    g.add(m);
+    return { m, a: (i / 7) * 6.28, r: 0.25 + (i % 3) * 0.2, y: (i / 7) * 2.2, v: 0.25 + (i % 4) * 0.1, s: 0.035 + (i % 3) * 0.018 };
+  });
+  g.userData.tick = (dt) => {
+    skull.position.y = 0.8 + Math.sin(U.time.value * 1.4 + ph) * 0.07 + (scared ? 0.35 : 0);
+    skull.rotation.y = Math.sin(U.time.value * 0.8 + ph) * 0.25;
+    for (const b of bubbles) {
+      b.y += b.v * dt; if (b.y > 2.2) b.y = 0.15;
+      b.m.position.set(Math.cos(b.a + b.y) * b.r, b.y, Math.sin(b.a + b.y) * b.r);
+      b.m.scale.setScalar(b.s);
+    }
+  };
+  g.userData.tick(0);
+  return g;
+}
+// gotas que espirram no susto
+const DROP_MAX = 60;
+const dropMesh = new THREE.InstancedMesh(bubbleGeo, new THREE.MeshBasicMaterial({ color: 0xff7fd0, fog: false }), DROP_MAX);
+dropMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); dropMesh.layers.set(1); dropMesh.frustumCulled = false; dropMesh.count = 0;
+scene.add(dropMesh);
+const drops = [], _dm = new THREE.Matrix4(), _dp = new THREE.Vector3(), _ds = new THREE.Vector3(), _dq = new THREE.Quaternion();
+function jellyBurst(x, y, z) {
+  for (let i = 0; i < 26; i++) { if (drops.length >= DROP_MAX) drops.shift(); drops.push({ x, y, z, vx: mr(-1.6, 1.6), vy: mr(3, 6.5), vz: mr(-1.6, 1.6), s: mr(0.05, 0.14), age: 0 }); }
+}
+function updateDrops(dt) {
+  for (let i = drops.length - 1; i >= 0; i--) { const d = drops[i]; d.age += dt; d.vy -= 11 * dt; d.x += d.vx * dt; d.y += d.vy * dt; d.z += d.vz * dt; if (d.y < 0 || d.age > 2) drops.splice(i, 1); }
+  drops.forEach((d, i) => dropMesh.setMatrixAt(i, _dm.compose(_dp.set(d.x, d.y, d.z), _dq, _ds.setScalar(d.s))));
+  dropMesh.count = drops.length;
+  dropMesh.instanceMatrix.needsUpdate = true;
+}
+
 const iconTex = (name, pal, key) => cachedTex('i|' + name + '|' + (key || ''), () => getSprite(name, pal, key));
 const textTex = (str, color) => cachedTex('t|' + str + '|' + color, () => textCanvas(str, color, '#07050d'));
 function pxSprite(t, { mul = 1, onTop = false, cx = 0.5, cy = 0, tint = 0xffffff } = {}) {
@@ -1322,7 +1513,7 @@ moon.shadow.mapSize.set(2048, 2048);
 Object.assign(moon.shadow.camera, { left: -32 * MAP_S, right: 32 * MAP_S, top: 32 * MAP_S, bottom: -32 * MAP_S, near: 1, far: 140 * MAP_S });
 moon.shadow.camera.updateProjectionMatrix();
 moon.shadow.bias = -0.0004; moon.shadow.normalBias = 0.04;
-const mapMid = new THREE.Vector3((mapBox.x0 + mapBox.x1) / 2, 0, (mapBox.z0 + mapBox.z1) / 2);
+const mapMid = new THREE.Vector3(mapView.x, 0, mapView.z);
 moon.position.set(-0.45, 1, -0.55).normalize().multiplyScalar(60 * MAP_S).add(mapMid);
 moon.target.position.copy(mapMid);
 scene.add(moon, moon.target);
@@ -1618,7 +1809,9 @@ function updateCamera(dt) {
   const desk = cssW > 760;
   const visW = desk ? cssW - 340 : cssW, visH = desk ? cssH : cssH - 150;
   // no celular a ilha ocupa a largura toda e desce para o vão entre a placa e o painel
-  const hh = (Math.max((23 * cssH) / visH, ((desk ? 28.5 : 24.5) * cssH) / Math.max(visW, 240)) * MAP_S) / view.zoom;
+  const baseFit = Math.max((23 * cssH) / visH, ((desk ? 28.5 : 24.5) * cssH) / Math.max(visW, 240));
+  const fit = PLAN.length ? Math.max(baseFit, ((mapView.halfV * 0.6 + 10) * cssH) / visH, ((mapView.halfU + 8) * cssH) / Math.max(visW, 240)) : baseFit;
+  const hh = fit / view.zoom;
   const hw = (hh * canW) / canH;
   const sx = desk ? (166 / canW) * 2 * hw : 0;
   const sy = ((desk ? -40 : -70) / canH) * 2 * hh;
@@ -1633,7 +1826,9 @@ const econ = { medics: false, mult: 5, scares: 0, hearts: 0, saved: 0, deaths: 0
 Object.assign(econ, Game.s.econ3d || {});
 const lapTime = (k) => LAP / (VMAX * k) + VMAX / (2 * ACC) + VMAX / (2 * DEC) + STOP_TIME;
 Game.baseRidersPerSec = () => (BASE_CARTS * SEATS) / lapTime(1);
-Game.ridersPerSec = () => (CART_N * SEATS) / lapTime(Lab.avgSpeedMult());
+Game.ridersPerSec = () => (CART_N * SEATS) / Math.max(5, lapTime(Lab.avgSpeedMult()) - turboSaved());
+// o dinheiro do susto fica no carrinho até ele chegar na casa: o estorno sai de lá
+Lab.takeBack = (amount) => { const paid = Math.min(train.carry, amount); train.carry -= paid; return paid; };
 Game.trainCount = () => CART_N;
 Game.medicActive = () => econ.medics;
 Game.save = function () {
@@ -1652,28 +1847,14 @@ function estimate() {
 const earn = (v) => Game.earn(v);
 
 /* ---------- UI ---------- */
-const logItems = [];
-const clockTxt = () => { const t = Math.floor(econ.time); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
-function log(msg, cls = '') {
-  logItems.unshift({ t: clockTxt(), msg, cls });
-  if (logItems.length > 7) logItems.pop();
-  $('log').replaceChildren(...logItems.map((it) => {
-    const li = document.createElement('li'), tm = document.createElement('time'), sp = document.createElement('span');
-    tm.textContent = it.t; sp.textContent = it.msg; if (it.cls) sp.className = it.cls; li.append(tm, sp); return li;
-  }));
-}
 let hudT = 0;
 function updateHUD() {
   $('medo').textContent = Game.s.infinite ? 'INFINITO' : fmtN(Game.s.medo, 3);
   const e = estimate();
   $('farm').textContent = `≈ ${fmtN(Math.max(0, e.farm), 2)} $MEDO/h`;
   $('loss').textContent = e.loss > 0.005 ? `≈ ${fmtN(e.loss, 2)}/h perdidos em infartos` : '';
-  $('sScares').textContent = econ.scares.toLocaleString('pt-BR');
-  $('sHearts').textContent = econ.hearts.toLocaleString('pt-BR');
-  $('sSaved').textContent = econ.saved.toLocaleString('pt-BR');
-  $('sDeaths').textContent = econ.deaths.toLocaleString('pt-BR');
-  $('sPaid').textContent = fmtN(econ.paid, 3);
-  $('sLaps').textContent = train.laps.toLocaleString('pt-BR');
+  $('carry').textContent = '+' + fmtN(train.carry, 3);
+  $('carryBar').style.width = (train.state === 'running' ? (train.dist / LAP) * 100 : 0) + '%';
   if (selected && selected.mon) $('cCount').textContent = selected.mon.count.toLocaleString('pt-BR');
 }
 function updateMintUI() {
@@ -1690,7 +1871,7 @@ function updateRoster() {
     const li = document.createElement('li'), b = document.createElement('button'), i = document.createElement('i'), n = document.createElement('span'), r = document.createElement('small');
     const rar = RAR[s.mon.rarity];
     i.style.background = rar.color; n.textContent = MON[s.mon.kind].name; r.textContent = rar.label;
-    if (Lab.picks.classRule !== 'off') { const c = Lab.classOf(s.mon.rec); r.textContent = c.label; r.style.color = c.color; }
+    if (Lab.picks.classRule !== 'off') { const cs = Lab.classesOf(s.mon.rec); r.textContent = cs.map((c) => c.label).join(' + '); r.style.color = cs[0].color; }
     b.append(i, n, r); b.setAttribute('aria-current', String(selected === s));
     b.addEventListener('click', () => selectSlot(s, true));
     li.append(b); return li;
@@ -1706,7 +1887,6 @@ function setMedics(on) {
     ? 'Com eles, o infarto vira um choque no carrinho e o visitante segue a volta.'
     : 'Sem eles, quem infarta morre e você paga a indenização à família.';
   medicGroup.visible = on;
-  log(on ? 'Os paramédicos chegaram na estação.' : 'Os paramédicos foram embora.', on ? 'good' : 'bad');
   updateHUD();
   Game.emit('change');
 }
@@ -1728,13 +1908,14 @@ function placeMonster(slot, kind, instant = false, rec = null) {
   Lab.dirty();
   const n = monTex(kind, false);  // o desenho 2D continua no cartão
   const g = new THREE.Group();
-  const body = new THREE.Mesh(voxelGeo(kind), matMon), scared = new THREE.Mesh(voxelGeo(SPRITES[kind + '_s'] ? kind + '_s' : kind), matMon);
+  const jelly = kind === 'geleca';
+  const body = jelly ? makeGeleca(false) : new THREE.Mesh(voxelGeo(kind), matMon), scared = jelly ? makeGeleca(true) : new THREE.Mesh(voxelGeo(SPRITES[kind + '_s'] ? kind + '_s' : kind), matMon);
   for (const o of [body, scared]) { o.castShadow = true; o.receiveShadow = true; g.add(o); }
   scared.visible = false;
   g.position.set(slot.x, PED_H, slot.z); g.rotation.order = 'YXZ'; g.rotation.y = view.yaw;
   scene.add(g);
   const label = pxSprite(textTex(MON[kind].short, rar.color));
-  slot.mon = { rec, kind, rarity: rar.key, g, body, scared, label, n, hgt: SPRITES[kind].length * VOX, face: view.yaw, spin: 0, tilt: 0, held: false, spinT: 0, scareT: 0, appear: instant ? 1 : 0, ph: Math.random() * 6, hop: mr(1, 4), count: 0 };
+  slot.mon = { rec, kind, rarity: rar.key, g, body, scared, label, n, hgt: jelly ? GELECA_H : body.geometry.boundingBox.max.y, face: view.yaw, spin: 0, tilt: 0, held: false, spinT: 0, scareT: 0, appear: instant ? 1 : 0, ph: Math.random() * 6, hop: mr(1, 4), count: 0 };
   slot.ringMat.color.set(rar.color);
   updateRoster(); updateMintUI();
   if (!instant) Game.emit('change');
@@ -1749,7 +1930,6 @@ function removeMonster(slot) {
   Game.s.monsters.splice(Game.s.monsters.indexOf(m.rec), 1);
   slot.mon = null;
   slot.ringMat.color.set('#3a2d5c');
-  log(`${MON[m.kind].name} saiu da vaga ${slot.i + 1}.`);
   if (selected === slot) closeCard();
   updateRoster(); updateMintUI(); updateHUD();
   Game.emit('change');
@@ -1760,12 +1940,13 @@ function scareAnim(slot) {
   if (!m) return;
   m.scareT = 0.75;
   m.body.visible = false; m.scared.visible = true;
+  if (m.kind === 'geleca') jellyBurst(slot.x, m.hgt + 0.6, slot.z);
   for (let i = 0; i < 6; i++) emit(slot.x - slot.nx * 0.6, mr(1.2, 2.4), slot.z - slot.nz * 0.6, -slot.nx * mr(0.5, 1.4), mr(0.2, 0.8), -slot.nz * mr(0.5, 1.4), mr(0.5, 0.8), mr(0.12, 0.2), COL.bat, 0);
 }
 // mintar: a cripta brilha, um raio vai até a vaga e o boneco sobe do chão
 function mint(target) {
   const free = slots.filter((s) => !s.mon && !s.minting);
-  if (!free.length) { log('Todas as vagas estão ocupadas.'); return; }
+  if (!free.length) { toast('Todas as vagas estão ocupadas.', 'bad'); return; }
   const slot = target && !target.mon && !target.minting ? target : free[Math.floor(Math.random() * free.length)];
   const rarity = Game.rollRarity();
   const kinds = RAR[rarity].kinds;
@@ -1787,7 +1968,6 @@ function updateMinting(dt) {
       burst(s.x, 0.8, s.z, col, 26, 2.4, 0.18);
       placeMonster(s, m.kind);
       const rar = RAR[MON[m.kind].rarity];
-      log(`Da cripta saiu ${MON[m.kind].name} (${rar.label}) na vaga ${s.i + 1}.`, rar.index >= 3 ? 'good' : '');
       floatText(rar.label, rar.color, s.x, 3.6, s.z, { life: 1.8, vy: 0.6 });
       selectSlot(s, false);
       $('cNew').hidden = false;
@@ -1825,6 +2005,7 @@ function updateMonsters(dt, dtReal) {
         m.spin = Math.atan2(Math.sin(m.spin), Math.cos(m.spin)) * (1 - k); m.tilt *= 1 - k;
       }
     }
+    if (m.body.userData.tick) (m.scareT > 0 ? m.scared : m.body).userData.tick(dt);
     m.g.rotation.set(m.tilt, m.face + m.spin, 0);
     m.g.scale.setScalar(sc);
     m.g.position.set(s.x - s.nx * lunge, y, s.z - s.nz * lunge);
@@ -1839,25 +2020,17 @@ const _w = new THREE.Vector3();
 function scarePass(slot, cart, cartIndex) {
   const m = slot.mon, rec = m.rec;
   if (!Lab.canScare(rec)) return;
-  const each = Game.rewardOf(rec) * Lab.cartFactor(cartIndex);
+  const each = Game.rewardOf(rec);
   const riders = cart.seats.filter((seat) => seat.alive);
   if (!riders.length) return;
   const gain = each * riders.length;
-  earn(gain); train.lapGain += gain;
-  let hit = 0, died = 0, cost = 0;
+  train.carry += gain;   // o susto enche o carrinho; a carteira só recebe quando ele chegar na casa
+  let hit = 0;
   for (const seat of riders) {
-    econ.scares++; m.count++;
+    m.count++;
     seat.earned += each;
     seat.fright = 1;
-    if (Math.random() < Lab.heartOf(rec) * econ.mult) {
-      const h = heartAttack(seat, rec, hit++);
-      died += h.died; cost += h.cost;
-    }
-  }
-  if (hit) {
-    const who = MON[m.kind].name, v = hit > 1 ? `${hit} visitantes infartaram` : 'um visitante infartou';
-    const what = died ? `${died > 1 ? died + ' morreram' : 'morreu'}` : 'os paramédicos atenderam';
-    log(`No susto do ${who}, ${v}: ${what}${cost > 0 ? `. Custo: ${fmtN(cost, 3)} $MEDO` : ''}.`, died ? 'bad' : 'good');
+    if (Math.random() < Lab.heartOf(rec) * Lab.cartHeart(cartIndex) * econ.mult) heartAttack(seat, rec, hit++);
   }
   scareAnim(slot);
   const p = cart.g.position;
@@ -1866,17 +2039,14 @@ function scarePass(slot, cart, cartIndex) {
 // k empilha os textos de quem infarta junto; o resultado depende da regra escolhida na aba TESTE
 function heartAttack(seat, rec, k = 0) {
   const up = k * 0.6;
-  econ.hearts++;
   seat.rider.g.getWorldPosition(_w);
   floatSprite(iconTex('heart'), _w.x, _w.y + 0.9, _w.z, { life: 0.9, vy: 0.6 });
   feeDiv = econ.mult;
   const res = Game.heartAttack(rec, seat.earned / econ.mult);
   feeDiv = 1;
-  let cost = 0;
-  if (res.refund > 0) { cost += res.refund; seat.earned = 0; floatText('-' + fmtN(res.refund, 3) + ' ESTORNO', '#ff8a1f', _w.x, _w.y + 3.1 + up, _w.z, { life: 1.8, vy: 0.45, delay: 0.3 }); }
-  if (res.bill > 0) { cost += res.bill; floatText('-' + fmtN(res.bill, 3) + ' HOSPITAL', '#ff8a1f', _w.x, _w.y + 3.1 + up, _w.z, { life: 1.8, vy: 0.45, delay: 0.3 }); }
+  if (res.refund > 0) { seat.earned = 0; floatText('-' + fmtN(res.refund, 3) + ' ESTORNO', '#ff8a1f', _w.x, _w.y + 3.1 + up, _w.z, { life: 1.8, vy: 0.45, delay: 0.3 }); }
+  if (res.bill > 0) { floatText('-' + fmtN(res.bill, 3) + ' HOSPITAL', '#ff8a1f', _w.x, _w.y + 3.1 + up, _w.z, { life: 1.8, vy: 0.45, delay: 0.3 }); }
   if (res.saved) {
-    econ.saved++;
     for (let i = 0; i < 18; i++) emit(_w.x, _w.y + 0.4, _w.z, mr(-2.2, 2.2), mr(0.4, 2.6), mr(-2.2, 2.2), mr(0.25, 0.5), mr(0.07, 0.14), i % 3 ? COL.zap : COL.zap2, 3);
     floatSprite(iconTex('bolt'), _w.x - 0.3, _w.y + 1.5, _w.z, { life: 0.8, vy: 0.4 });
     floatSprite(iconTex('medic'), _w.x + 0.3, _w.y + 1.5, _w.z, { life: 0.8, vy: 0.4 });
@@ -1889,15 +2059,10 @@ function heartAttack(seat, rec, k = 0) {
       seat.shock = 0.9;
       floatText('CHOQUE! SALVO', '#5ee07a', _w.x, _w.y + 2.5 + up, _w.z, { life: 1.4, vy: 0.5, delay: 0.15 });
     }
-    econ.paid += cost;
-    return { died: 0, cost };
+    return;
   }
-  econ.deaths++;
   seat.alive = false; seat.dying = 0;
-  cost += res.fee;
-  econ.paid += cost;
   floatText('-' + fmtN(res.fee, 3) + ' INDENIZACAO', '#ff5a6a', _w.x, _w.y + 2.4 + up, _w.z, { life: 1.8, vy: 0.45, delay: 0.2 });
-  return { died: 1, cost };
 }
 function updateRiders(dt) {
   for (const c of carts) for (const seat of c.seats) {
@@ -1926,24 +2091,45 @@ function updateRiders(dt) {
 }
 // na estação: quem morreu dá lugar a um visitante novo da fila
 function board() {
-  let n = 0;
-  for (const c of carts) for (const seat of c.seats) { seat.earned = 0; if (!seat.alive) { seatRider(c.g, seat); n++; } }
-  if (n) log(`${n} ${n > 1 ? 'novos visitantes subiram' : 'visitante novo subiu'} no trem.`);
+  for (const c of carts) for (const seat of c.seats) { seat.earned = 0; if (!seat.alive) seatRider(c.g, seat); }
+}
+// o carrinho chegou na casa: tudo o que ele juntou na volta cai na carteira de uma vez
+function payTrain() {
+  const v = train.carry;
+  train.carry = 0;
+  if (v <= 0) return;
+  Game.earn(v);
+  floatText('+' + fmtN(v, 3) + ' $MEDO', '#ffd23f', 7.6, 5.4, -11, { life: 2.4, vy: 0.7 });
+  burst(7.6, 2.4, -11, COL.zap, 22, 2.2, 0.15);
+  const bal = $('medo');
+  bal.classList.remove('pay'); void bal.offsetWidth; bal.classList.add('pay');
+  updateHUD();
+  Game.save();
 }
 function updateTrain(dt) {
   if (train.state === 'boarding') {
     train.wait -= dt;
     if (train.wait <= 0) {
-      train.state = 'running'; train.dist = 0; train.v = 0; train.lapGain = 0;
+      train.state = 'running'; train.dist = 0; train.v = 0; train.boost = 0;
       carts.forEach((c, i) => { c.prev = -OFFS[i]; });
     }
   } else {
     const rem = LAP - train.dist;
     // trilho e manutenção mudam a velocidade; FREIO DO SUSTO quase para em cada boneco
     const ts = Lab.trackStats(), near = ts.brake && slots.some((s) => s.mon && Math.abs(train.dist - s.d) < 3);
-    const vt = Math.min(VMAX * (near ? ts.brake * Lab.oilSpeed() : Lab.speedMult()), Math.sqrt(2 * DEC * Math.max(0, rem)) + 0.05);
-    train.v += clamp(vt - train.v, -6 * dt, ACC * dt);
+    if (train.boost > 0) train.boost -= dt;
+    const boost = train.boost > 0 ? LAB_TURBO.boost : 1;
+    const vt = Math.min(VMAX * boost * (near ? ts.brake * Lab.oilSpeed() : Lab.speedMult()), Math.sqrt(2 * DEC * Math.max(0, rem)) + 0.05);
+    train.v += clamp(vt - train.v, -6 * dt, (boost > 1 ? 6 : ACC) * dt);
+    const before = train.dist;
     train.dist = Math.min(LAP, train.dist + train.v * dt);
+    // passou num trecho turbo comprado
+    for (let k = 0; k < turboOwned(); k++) if (before < PAD_D[k] && train.dist >= PAD_D[k]) {
+      train.boost = LAB_TURBO.secs;
+      const p = lapPt(train.dist);
+      floatText('TURBO!', '#ff8a1f', p.x, 2.6, p.z, { life: 1.2 });
+      burst(p.x, 0.6, p.z, COL.zap, 18, 2.4, 0.14);
+    }
     carts.forEach((c, i) => {
       const cur = train.dist - OFFS[i];
       for (const s of slots) if (s.mon && s.mon.appear >= 1 && c.prev < s.d && cur >= s.d) scarePass(s, c, i);
@@ -1951,7 +2137,7 @@ function updateTrain(dt) {
     });
     if (train.dist >= LAP - 0.01) {
       train.state = 'boarding'; train.dist = 0; train.v = 0; train.wait = STOP_TIME; train.laps++;
-      if (train.lapGain > 0) log(`Volta ${train.laps} completa: +${fmtN(train.lapGain, 3)} $MEDO em sustos.`);
+      payTrain();
       board();
     }
   }
@@ -2031,7 +2217,7 @@ function updateSouls(dt) {
 }
 function collect(kind, mult, x, y, z) {
   const v = goodieValue(mult);
-  if (v <= 0) { floatText('SEM BONECOS', '#aaa5c6', x, y + 0.6, z, { life: 1.2 }); log(`Sem bonecos na pista, ${kind} não rende nada.`); return; }
+  if (v <= 0) { floatText('SEM BONECOS', '#aaa5c6', x, y + 0.6, z, { life: 1.2 }); return; }
   earn(v);
   floatText('+' + fmtN(v, 3), '#ffd23f', x, y + 0.6, z, { life: 1.3 });
 }
@@ -2044,6 +2230,7 @@ const vitrine = (() => {
   try { r = new THREE.WebGLRenderer({ canvas: cv, antialias: false, alpha: true }); } catch (err) { return null; }
   r.setPixelRatio(1); r.setSize(LOW, LOW, false); r.setClearColor(0x000000, 0);
   const sc = new THREE.Scene(), cm = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.1, 60);
+  cm.layers.enable(1);   // a geleca fica na camada dos transparentes
   sc.add(new THREE.HemisphereLight(0xc0b8e8, 0x2a1d3a, 2.2));
   const key = new THREE.DirectionalLight(0xffe2c0, 2.4); key.position.set(3, 5, 6);
   const rim = new THREE.DirectionalLight(0xffffff, 2.0); rim.position.set(-5, 3, -4);
@@ -2057,11 +2244,12 @@ const vitrine = (() => {
   let body = null, scared = null, yaw = 0.6, tilt = 0, drag = null, idle = 0, scareT = 0;
   function show(kind) {
     holder.clear();
-    body = new THREE.Mesh(voxelGeo(kind), matMon);
-    scared = new THREE.Mesh(voxelGeo(SPRITES[kind + '_s'] ? kind + '_s' : kind), matMon);
+    const jelly = kind === 'geleca';
+    body = jelly ? makeGeleca(false) : new THREE.Mesh(voxelGeo(kind), matMon);
+    scared = jelly ? makeGeleca(true) : new THREE.Mesh(voxelGeo(SPRITES[kind + '_s'] ? kind + '_s' : kind), matMon);
     scared.visible = false;
     holder.add(body, scared);
-    const bb = body.geometry.boundingBox, hgt = bb.max.y - bb.min.y;
+    const bb = jelly ? { min: { x: -1.3, y: 0 }, max: { x: 1.3, y: GELECA_H } } : body.geometry.boundingBox, hgt = bb.max.y - bb.min.y;
     const half = (Math.max(hgt + 0.7, bb.max.x - bb.min.x, 2.8) / 2) * 1.12, cy = (bb.max.y - 0.4) / 2;
     Object.assign(cm, { left: -half, right: half, top: half, bottom: -half });
     cm.position.set(0, cy + 6, 14); cm.lookAt(0, cy, 0); cm.updateProjectionMatrix();
@@ -2077,6 +2265,7 @@ const vitrine = (() => {
       tilt *= 1 - Math.min(1, dt * 2);
     }
     if (scareT > 0) { scareT -= dt; if (scareT <= 0) { body.visible = true; scared.visible = false; } }
+    if (body.userData.tick) (scareT > 0 ? scared : body).userData.tick(dt);
     holder.rotation.set(tilt, yaw, 0);
     r.render(sc, cm);
   }
@@ -2144,7 +2333,7 @@ function onPick(kind, ref, pt) {
       floatText('CARREGADO!', '#5ee07a', ref.x, 3.4, ref.z, { life: 1.2 });
       burst(ref.x, 1.4, ref.z, COL.zap, 14, 1.6, 0.12);
     } else if (ref.mon) selectSlot(ref, true);
-    else if (!ref.minting) { log(`Invocando um boneco na vaga ${ref.i + 1}…`); mint(ref); }
+    else if (!ref.minting) mint(ref);
   } else if (kind === 'crypt') {
     mint();
   } else if (kind === 'bat') {
@@ -2164,7 +2353,7 @@ function onPick(kind, ref, pt) {
       towerGhost = floatSprite(iconTex('ghost_s'), -2.65, 6.45, -9.6, { life: 1.4, vy: 0, onTop: false });
       setTimeout(() => { towerGhost = null; }, 1500);
     }
-    log('Algo olhou pela janela da torre…');
+
   } else if (kind === 'train') {
     // manutenção VÔMITO: clique no carrinho sujo limpa
     if (Lab.dirt(ref) > 0.1) {
@@ -2175,9 +2364,6 @@ function onPick(kind, ref, pt) {
       return;
     }
     for (const c of carts) for (const s of c.seats) if (s.alive) s.fright = 1;
-    log('AAAAH! Os visitantes gritaram.');
-  } else if (kind === 'medic') {
-    log('Paramédico: “Pode mandar susto, estamos de plantão!”', 'good');
   }
 }
 const raycaster = new THREE.Raycaster();
@@ -2218,7 +2404,7 @@ canvas.addEventListener('pointermove', (e) => {
   pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
   if (pinch && pointers.size === 2) {
     const [a, b] = [...pointers.values()];
-    view.zoomT = clamp((pinch.z * Math.hypot(a.x - b.x, a.y - b.y)) / pinch.d, 0.6, 3);
+    view.zoomT = clamp((pinch.z * Math.hypot(a.x - b.x, a.y - b.y)) / pinch.d, 0.6, 3 * MAP_S);
     return;
   }
   if (!drag) return;
@@ -2245,7 +2431,7 @@ function endPointer(e, cancel) {
 }
 canvas.addEventListener('pointerup', (e) => endPointer(e, false));
 canvas.addEventListener('pointercancel', (e) => endPointer(e, true));
-canvas.addEventListener('wheel', (e) => { e.preventDefault(); view.zoomT = clamp(view.zoomT * Math.exp(-e.deltaY * 0.0012), 0.6, 3); }, { passive: false });
+canvas.addEventListener('wheel', (e) => { e.preventDefault(); view.zoomT = clamp(view.zoomT * Math.exp(-e.deltaY * 0.0012), 0.6, 3 * MAP_S); }, { passive: false });
 
 const state = { paused: false, speed: 1 };
 function setPaused(p) {
@@ -2305,18 +2491,66 @@ window.addEventListener('resize', resize);
 const worldSlots = slots.map((s) => ({ x: s.x * 8, y: (s.z * 8) / 1.3, i: s.i, isle: s.isle }));
 const worldLots = LOTS.map((l) => ({ x: l.x * 8, y: (l.z * 8) / 1.3, i: l.i }));
 window.World = {
-  SLOTS: worldSlots, LOTS: worldLots, viewW: Math.round(W * MAP_S), slotsFree: true,
+  SLOTS: worldSlots, LOTS: worldLots, ITEM_SLOTS, viewW: Math.round(W * MAP_S), slotsFree: true, labTabs: true,
+  // compra de ilha: sorteia raridade, tipo e o quanto ela sai do lugar certinho da grade
+  onBuyLevel(mode) {
+    if (mode !== 'islands') return;
+    const pos = ISLE_ORDER[islesSt.length], all = Object.keys(ISLE_RARITY);
+    let roll = Math.random() * all.reduce((a, k) => a + ISLE_RARITY[k].weight, 0), rarity = all[0];
+    for (const k of all) { roll -= ISLE_RARITY[k].weight; if (roll <= 0) { rarity = k; break; } }
+    islesSt.push({ pos, rarity, type: Math.floor(Math.random() * ISLE_TYPES.length), jx: mr(-9, 9), jz: mr(-9, 9), bow: mr(-4, 4), ph: mr(0, 6.28) });
+  },
+  onDropLevel(mode) { if (mode === 'islands') islesSt.pop(); },
+  trackPanel() {
+    if (Lab.picks.track !== 'pads') return '';
+    const n = turboOwned(), lap = lapTime(Lab.avgSpeedMult()), saved = turboSaved(), each = LAB_TURBO.secs * (1 - 1 / LAB_TURBO.boost);
+    return `<div class="lab-status"><span>Trechos <b>${n}/${LAB_TURBO.max}</b></span><span>Volta <b>${Math.round(lap - saved)}s</b></span><span>Ganho <b>-${saved.toFixed(1)}s</b></span></div>
+      <div class="row-btns">${n < LAB_TURBO.max ? `<button class="btn sm" data-act="labturbo" ${Game.canAfford(LAB_TURBO.cost) ? '' : 'disabled'}>COMPRAR TRECHO · ${Game.s.infinite ? 'GRÁTIS' : LAB_TURBO.cost + ' $MEDO'}</button>` : '<span class="tag">TUDO COMPRADO</span>'}${n ? '<button class="btn sm ghost" data-act="labturbodown">TIRAR UM</button>' : ''}</div>
+      <p class="muted small">Cada trecho dá ${LAB_TURBO.boost}x de velocidade por ${LAB_TURBO.secs}s e corta ${each.toFixed(1)}s da volta. Em volta curta isso rende mais clientes por hora: agora ${lap > saved ? '+' + Math.round((lap / (lap - saved) - 1) * 100) + '%' : '0%'}.</p>`;
+  },
+  labAct(a, d) {
+    const st = Lab.st(), inv = Lab.items();
+    if (a === 'labturbo') { if (turboOwned() < LAB_TURBO.max && Game.spend(LAB_TURBO.cost)) { st.turbo = (st.turbo || 0) + 1; Lab.afterFix(); } return true; }
+    if (a === 'labturbodown') { st.turbo = Math.max(0, (st.turbo || 0) - 1); Lab.afterFix(); return true; }
+    if (a === 'itemmint') {
+      if (!Game.spend(LAB_ITEM_MINT)) return true;
+      const keys = Object.keys(LAB_ITEMS), key = keys[Math.floor(Math.random() * keys.length)];
+      inv.inv[key] = (inv.inv[key] || 0) + 1;
+      toast('Saiu do mint: ' + LAB_ITEMS[key].name + '!', 'good');
+      Lab.afterFix(); return true;
+    }
+    if (a === 'itemisle') { itemIsle = +d.i; renderItems(true); return true; }
+    if (a === 'itemequip') {
+      const spot = itemSpotsOf(itemIsle).slice(0, itemOpen(itemIsle)).find((s) => !inv.equip[s.i]);
+      if (!spot) { toast('Sem slot livre nesta ilha.', 'bad'); return true; }
+      if (!(inv.inv[d.key] > 0)) return true;
+      inv.inv[d.key]--; inv.equip[spot.i] = d.key;
+      Lab.afterFix(); return true;
+    }
+    if (a === 'itemun') {
+      const key = inv.equip[d.i];
+      if (key) { delete inv.equip[d.i]; inv.inv[key] = (inv.inv[key] || 0) + 1; Lab.afterFix(); }
+      return true;
+    }
+    if (a === 'itemslot') {
+      const open = itemOpen(itemIsle);
+      if (open < itemSpotsOf(itemIsle).length && Game.spend(LAB_ITEM_SLOT * (open + 1))) { inv.open[itemIsle] = open + 1; Lab.afterFix(); }
+      return true;
+    }
+    return false;
+  },
   // trilho e terreno são montados ao abrir a página: quem muda o mapa recarrega
   rebuild() {
     try {
       sessionStorage.setItem('lab3d.scale', String(MAP_S));
       sessionStorage.setItem('lab3d.tab', tab3d);
+      sessionStorage.setItem('lab3d.sec', LabUI.sec || '');
       sessionStorage.setItem('lab3d.scroll', String($('labBody').scrollTop));
     } catch (e) { /* sem storage */ }
     setTimeout(() => location.reload(), 60);
   },
 };
-let tab3d = 'park', labHtml = '';
+let tab3d = 'mons', labHtml = '', itemsHtml = '', itemIsle = -1;
 const moneyStr = (v) => (v >= 100 ? String(Math.round(v)) : Number(v).toFixed(2));
 const perHourStr = (v) => (v < 10 ? Number(v).toFixed(2) : v < 10000 ? String(Math.round(v)) : Math.round(v / 1000) + 'k');
 const pctStr = (v) => +(v * 100).toFixed(2) + '%';
@@ -2351,11 +2585,37 @@ function renderLab() {
 }
 function setTab(t) {
   tab3d = t;
-  $('tabPark').setAttribute('aria-selected', String(t === 'park'));
-  $('tabLab').setAttribute('aria-selected', String(t === 'lab'));
-  $('pbody').hidden = t !== 'park';
-  $('labBody').hidden = t !== 'lab';
+  for (const [key, tabId, bodyId] of [['mons', 'tabMons', 'monsBody'], ['items', 'tabItems', 'itemsBody'], ['park', 'tabPark', 'pbody'], ['lab', 'tabLab', 'labBody']]) {
+    $(tabId).setAttribute('aria-selected', String(t === key));
+    $(bodyId).hidden = t !== key;
+  }
   if (t === 'lab') renderLab();
+  if (t === 'items') renderItems(true);
+}
+// aba ITENS: mint, inventário e os slots de cada ilha
+const itemSpotsOf = (isle) => ITEM_SLOTS.filter((s) => s.isle === isle);
+const itemOpen = (isle) => { const open = Lab.items().open[isle], cap = itemSpotsOf(isle).length; return Math.min(cap, open === undefined ? Math.max(1, Math.floor(cap / 2)) : open); };
+const itemIsleName = (isle) => (isle < 0 ? 'Principal' : `Ilha ${PLAN[isle].pos}`);
+function renderItems(force) {
+  if (!force && tab3d !== 'items') return;
+  const inv = Lab.items(), owned = Object.entries(LAB_ITEMS).filter(([k]) => inv.inv[k] > 0), active = Lab.picks.decor === 'items';
+  const isles = [-1, ...PLAN.map((_, n) => n)].filter((i) => itemSpotsOf(i).length);
+  if (!isles.includes(itemIsle)) itemIsle = -1;
+  const spots = itemSpotsOf(itemIsle), open = itemOpen(itemIsle);
+  const html = `${active ? '' : '<p class="muted small">Ative em TESTE, ENFEITES: INVENTÁRIO, para os itens valerem.</p>'}
+    <h4>MINT DE ITENS</h4>
+    <button class="btn primary" data-act="itemmint" ${Game.canAfford(LAB_ITEM_MINT) ? '' : 'disabled'}>MINTAR ITEM · ${Game.s.infinite ? 'GRÁTIS' : LAB_ITEM_MINT + ' $MEDO'}</button>
+    <h4>INVENTÁRIO</h4>
+    ${owned.length ? `<div class="item-list">${owned.map(([k, it]) => `<div class="item-row">${sprHtml(Lab.lookSprite(k), 2)}<span><b>${it.name}</b> x${inv.inv[k]}<br><span class="muted small">${LabUI.itemEffect({ farm: it.farm * LAB_ITEM_POWER, heart: Math.max(0.2, 1 - (1 - it.heart) * LAB_ITEM_POWER) })}</span></span><button class="btn sm" data-act="itemequip" data-key="${k}">EQUIPAR</button></div>`).join('')}</div>` : '<p class="muted small">Nenhum item ainda. Faça um mint.</p>'}
+    <h4>SLOTS DA ILHA</h4>
+    <div class="chips">${isles.map((i) => `<button class="chip${i === itemIsle ? ' on' : ''}" data-act="itemisle" data-i="${i}" style="--c:var(--gold)">${itemIsleName(i).toUpperCase()}</button>`).join('')}</div>
+    <div class="item-slots">${spots.map((s, n) => { const key = inv.equip[s.i]; if (n >= open) return '<div class="item-slot locked">🔒</div>'; return key ? `<button class="item-slot full" data-act="itemun" data-i="${s.i}" title="Tirar ${LAB_ITEMS[key].name}">${sprHtml(Lab.lookSprite(key), 2)}</button>` : '<div class="item-slot">vazio</div>'; }).join('')}</div>
+    ${open < spots.length ? `<button class="btn sm" data-act="itemslot" ${Game.canAfford(LAB_ITEM_SLOT * (open + 1)) ? '' : 'disabled'}>ABRIR SLOT · ${Game.s.infinite ? 'GRÁTIS' : LAB_ITEM_SLOT * (open + 1) + ' $MEDO'}</button>` : ''}
+    <p class="muted small">O item aparece no mapa e vale para os bonecos da ilha dele. Clique num slot cheio para tirar.</p>`;
+  if (html === itemsHtml) return;
+  itemsHtml = html;
+  $('itemsPanel').innerHTML = html;
+  hydrate($('itemsPanel'));
 }
 function openModal(html) {
   const box = $('labModalBox');
@@ -2371,21 +2631,57 @@ LabUI.bind({
 });
 const labClick = (e) => { const b = e.target.closest('[data-act]'); if (b && !b.disabled) LabUI.act(b.dataset.act, b.dataset); };
 $('labPanel').addEventListener('click', labClick);
+$('itemsPanel').addEventListener('click', labClick);
 $('cLab').addEventListener('click', labClick);
 $('labModal').addEventListener('click', (e) => {
   if (e.target.id === 'labModal' || e.target.closest('[data-close]')) closeModal(); else labClick(e);
 });
+$('tabMons').addEventListener('click', () => setTab('mons'));
+$('tabItems').addEventListener('click', () => setTab('items'));
 $('tabPark').addEventListener('click', () => setTab('park'));
 $('tabLab').addEventListener('click', () => setTab('lab'));
 $('btnInfinite').addEventListener('click', () => { Game.toggleInfinite(); updateHUD(); });
 Game.on('toast', (t) => toast(t.text, t.kind));
 function labChanged() {
-  syncDecor(); syncLinks(); syncBuffLabels();
+  syncDecor(); syncLinks(); syncBuffLabels(); syncPads();
   if (tab3d === 'lab') renderLab();
+  renderItems();
   updateRoster();
   if (selected && selected.mon) fillCard(selected);
 }
 Game.on('change', labChanged);
+
+// bonecos novos: a lista mostra o estilo de cada um; clicar põe o boneco na pista e abre o cartão
+const NEW_KINDS = ['geleca', ...Object.keys(VOXEL_MODELS)];
+World.labExtra = [['mons', 'BONECOS', () => {
+  const row = (k, label) => `<button class="btn sm ghost" data-show="${k}">${label}</button>`;
+  const group = (st) => Object.entries(VOXEL_MODELS).filter(([, m]) => m.style === st);
+  return `<section class="lab-card"><h4><span class="lab-n">★</span>BONECOS NOVOS</h4>
+    <p class="muted small">Clique para colocar na pista e ver girando.</p>
+    <p class="muted small">ESPECIAL: geleca translúcida</p><div class="row-btns">${row('geleca', 'GELECA')}</div>
+    ${['A', 'B'].map((st) => `<p class="muted small">ESTILO ${st} · ${VOXEL_STYLE_NAMES[st]} (${group(st).length})</p><div class="row-btns">${group(st).map(([k, m]) => row(k, m.label.toUpperCase())).join('')}</div>`).join('')}
+    <div class="row-btns"><button class="btn sm" data-fill="1">ENCHER A PISTA</button></div></section>`;
+}]];
+let showIdx = 0;
+function showNew(kind, open = true) {
+  const order = Game.slotOrder.map((i) => slots[i]);
+  const slot = (open && selected && !selected.minting ? selected : null) || order.find((s) => !s.mon && !s.minting) || order[showIdx++ % order.length];
+  if (slot.mon) removeMonster(slot);
+  placeMonster(slot, kind, !open);
+  if (open) { selectSlot(slot, false); $('cNew').hidden = true; }
+  Game.save();
+}
+$('labPanel').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-show],[data-fill]');
+  if (!b) return;
+  if (b.dataset.show) { showNew(b.dataset.show); return; }
+  const order = Game.slotOrder.map((i) => slots[i]), n = Math.min(NEW_KINDS.length, order.length);
+  closeCard();
+  for (let i = 0; i < n; i++) { if (order[i].mon) removeMonster(order[i]); placeMonster(order[i], NEW_KINDS[i], true); }
+  Game.emit('change'); Game.save();
+  const left = NEW_KINDS.slice(n).map((k) => VOXEL_MODELS[k].label);
+  toast(left.length ? 'Pista cheia! Sem vaga para: ' + left.join(', ') + '. Clique no nome para ver.' : 'Todos os bonecos novos na pista!', left.length ? '' : 'good');
+});
 
 // enfeites: o desenho 2D escolhido na aba vira um boneco de blocos, igual aos monstros
 const lotGroup = new THREE.Group();
@@ -2405,6 +2701,7 @@ function syncDecor() {
   if (mode === 'lots') for (const l of LOTS) if (st.lots[l.i]) list.push([st.lots[l.i], l.x, l.z, 0.9]);
   if (mode === 'global') st.global.forEach((k, n) => { if (GSPOTS[n]) list.push([k, GSPOTS[n].x, GSPOTS[n].z, 0.9]); });
   if (mode === 'acc') for (const s of slots) if (s.mon && st.acc[s.i]) list.push([st.acc[s.i], s.x + s.nz * 1.25, s.z - s.nx * 1.25, 0.6]);
+  if (mode === 'items') for (const [idx, key] of Object.entries(Lab.items().equip)) { const sp = ITEM_SLOTS[+idx]; if (sp) list.push([key, sp.x, sp.z, 0.9]); }
   lotGroup.visible = mode === 'lots';
   for (const l of LOTS) l.plus.sp.visible = mode === 'lots' && !st.lots[l.i];
   const sig = JSON.stringify(list) + JSON.stringify(Lab.picks.looks);
@@ -2417,6 +2714,31 @@ function syncDecor() {
     scene.add(m);
     return { m, key };
   });
+}
+// turbo em trechos: pontos fixos da volta; só os comprados aparecem e aceleram
+const turboOwned = () => (Lab.picks.track === 'pads' ? Math.min(LAB_TURBO.max, Lab.st().turbo || 0) : 0);
+function turboSaved() { return turboOwned() * LAB_TURBO.secs * (1 - 1 / LAB_TURBO.boost); }
+const PAD_D = Array.from({ length: LAB_TURBO.max }, (_, k) => 14 + (k * (LAP - 34)) / (LAB_TURBO.max - 1));
+const padMat = new THREE.MeshBasicMaterial({ vertexColors: true, color: 0xff8a1f });
+const pads = PAD_D.map((d) => {
+  const b = new Builder();
+  for (let k = 0; k < 7; k++) { const p = lapPt(d - 3 + k), rot = trackRot(p); b.box(p.x, 0.2, p.z, 0.34, 0.05, 1.3, k % 2 ? '#ffd23f' : '#ffffff', rot, 0); }
+  const m = b.mesh(padMat, { cast: false, receive: false });
+  m.visible = false; scene.add(m);
+  return m;
+});
+function syncPads() { const n = turboOwned(); pads.forEach((m, k) => { m.visible = k < n; }); }
+// vômito: poças pelo trilho, que aumentam conforme os carrinhos sujam
+const PUD_MAX = 140;
+const pudMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 0.05, 1), new THREE.MeshBasicMaterial({ color: 0x7cc85a }), PUD_MAX);
+pudMesh.frustumCulled = false; pudMesh.count = 0; scene.add(pudMesh);
+{
+  const m4 = new THREE.Matrix4(), pos = new THREE.Vector3(), sc = new THREE.Vector3(), q = new THREE.Quaternion();
+  for (let i = 0; i < PUD_MAX; i++) {
+    const s = Math.random() * LAP, p = trackAt(s), side = mr(-1.4, 1.4), w = mr(0.25, 0.7);
+    pudMesh.setMatrixAt(i, m4.compose(pos.set(p.x - p.tz * side, 0.17, p.z + p.tx * side), q, sc.set(w, 1, w * mr(0.6, 1.2))));
+  }
+  pudMesh.instanceMatrix.needsUpdate = true;
 }
 // classes: linha colorida entre os bonecos que estão se ajudando
 const linkGeo = new THREE.BufferGeometry();
@@ -2502,6 +2824,9 @@ function updateMaint(dt) {
       gauge.sp.position.set(PROP.x, 3, PROP.z);
     }
   }
+  pudMesh.count = o === 'vomit' ? Math.round(w * PUD_MAX) : 0;
+  $('grime').style.opacity = o === 'vomit' ? (w * 0.85).toFixed(2) : 0;
+  if (dt > 0 && o === 'vomit' && Math.random() < dt * w * 8) { const p = trackAt(Math.random() * LAP); emit(p.x, 0.5, p.z, mr(-0.4, 0.4), mr(0.3, 0.8), mr(-0.4, 0.4), mr(0.6, 1), 0.08, COL.vomit); }
   carts.forEach((c, i) => { const d = Lab.dirt(i); c.dirt[0].visible = d > 0.2; c.dirt[1].visible = d > 0.5; c.dirt[2].visible = d > 0.8; });
   for (const s of slots) {
     const m = s.mon;
@@ -2598,6 +2923,7 @@ function step(dtReal) {
   updateFloaters(dt);
   updateMaint(dt);
   updateParts(dt);
+  updateDrops(dt);
   updateCamera(dtReal);
   if (!settings.pixel) sky.frame(dtReal);
   sizeSprites();
@@ -2608,25 +2934,25 @@ function step(dtReal) {
 }
 
 // abertura: na primeira vez, um boneco clássico de cada raridade; depois, o parque salvo
-if (firstRun) [[0, 'ghost'], [1, 'zombie'], [3, 'wolf'], [5, 'vamp'], [6, 'reaper']].forEach(([i, k]) => placeMonster(slots[i], k, true));
+if (firstRun) [[0, 'ghost'], [1, 'zombie'], [2, 'geleca'], [3, 'wolf'], [5, 'vamp'], [6, 'reaper']].forEach(([i, k]) => placeMonster(slots[i], k, true));
 else for (const rec of Game.s.monsters) if (rec.slot >= 0 && rec.slot < slots.length && !slots[rec.slot].mon) placeMonster(slots[rec.slot], rec.kind, true, rec);
 if (window.innerWidth < 760) { settings.px = 2; $('px').value = '2'; $('pxOut').textContent = '2'; }
 setPixel(settings.pixel);
 setMult(econ.mult);
 updateMintUI();
-syncDecor(); syncLinks(); syncBuffLabels(); renderLab();
-log('O parque abriu. Clique nos bonecos, nas vagas vazias, na cripta, nos morcegos e nas almas.');
+syncDecor(); syncLinks(); syncBuffLabels(); syncPads(); renderLab();
 if (econ.medics) { medicGroup.visible = true; setMedics(true); }
 {
   // o tempo fora do jogo rende (e desgasta) como no clássico
   const off = Game.applyOffline();
-  if (off.gained > 0) log(`Enquanto você esteve fora, seus monstros juntaram ${fmtN(off.gained, 3)} $MEDO.`, 'good');
+  if (off.gained > 0) toast(`Enquanto você esteve fora, seus monstros juntaram ${fmtN(off.gained, 3)} $MEDO.`, 'good');
   // depois de uma expansão a página recarrega: a câmera sai de onde estava e o painel volta para a aba TESTE
   try {
     const was = +sessionStorage.getItem('lab3d.scale');
     if (was && MAP_S > was) { view.zoom = MAP_S / was; view.intro = 2.4; toast('Mapa expandido! Veja as vagas novas.', 'good'); }
+    if (sessionStorage.getItem('lab3d.sec')) LabUI.sec = sessionStorage.getItem('lab3d.sec');
     if (sessionStorage.getItem('lab3d.tab') === 'lab') { setTab('lab'); $('labBody').scrollTop = +sessionStorage.getItem('lab3d.scroll') || 0; }
-    for (const k of ['lab3d.scale', 'lab3d.tab', 'lab3d.scroll']) sessionStorage.removeItem(k);
+    for (const k of ['lab3d.scale', 'lab3d.tab', 'lab3d.scroll', 'lab3d.sec']) sessionStorage.removeItem(k);
   } catch (e) { /* sem storage */ }
 }
 updateHUD();

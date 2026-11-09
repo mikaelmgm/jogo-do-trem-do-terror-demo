@@ -820,6 +820,24 @@ const SPRITES = {
   ],
 
   // ---------------- PARQUE ----------------
+  geleca: [
+    '................',
+    '......kkkk......',
+    '....kkKKKKkk....',
+    '...kKpKKKKKKk...',
+    '...kKpKwwwKKk...',
+    '..kKKKwkwkwKKk..',
+    '..kKKKwwwwwKKk..',
+    '..kKKKKwkwKKKk..',
+    '..kKKKKKKKKUKk..',
+    '.kKKUKKKKKKKKKk.',
+    '.kKKKKKKpKKKKKk.',
+    '.kKUKKKKKKKKUKk.',
+    'kKKKKKKKKKKKKKKk',
+    'kUKKKUKKKKUKKKUk',
+    '.kkkkkkkkkkkkkk.',
+    '................',
+  ],
   cart: [
     '.kkkkkkkkkkk.',
     'kRrrrrrrrrrRk',
@@ -1091,6 +1109,7 @@ const SCARE_PATCH = {
   herobrine: { 5: '...kdwwwwwwdk...', 7: '...kdkkkkkkdk...' },
   saci:      { 6: '....kFrkFrkFkg..', 8: '....kFkRRRFkkBo.', 14: '...gg..kFk..gg..', 15: '..g..kkFkk..g...' },
   frank:     { 6: 'kGGkirxiirxikGGk', 9: '...kiiRRRRiik...' },
+  geleca:    { 5: '..kKKKwrwrwKKk..', 7: '..kKKKwkkkwKKk..', 8: '..kKKKKwRwKKUKk.' },
   mummy:     { 3: '.....kSyRSSdSk..', 4: '.....kRRRSSSdk..' },
 };
 for (const [name, rows] of Object.entries(SCARE_PATCH)) {
