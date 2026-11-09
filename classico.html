@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Casa Assombrada · Trem Fantasma</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <canvas class="spr" data-spr="ghost" data-scale="2"></canvas>
+      <div>
+        <h1>CASA ASSOMBRADA</h1>
+        <span class="sub">TREM FANTASMA · TESTNET</span>
+      </div>
+    </div>
+    <div class="actions">
+      <nav class="style-switch" aria-label="Estilo do jogo">
+        <span aria-current="page">CLÁSSICO</span>
+        <a href="index.html">3D</a>
+      </nav>
+      <button id="btnMissions" class="btn ghost hud-btn">MISSÕES <span id="missionPill" class="pill hidden"></span></button>
+      <button id="medicBadge" class="medic-badge off">✚ SEM PARAMÉDICOS</button>
+      <button id="btnWallet" class="btn ghost">CONECTAR CARTEIRA</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="stage" id="stage">
+      <div class="stage-tools">
+        <div class="fx-ctl">
+          <label for="fxMode">FILTRO</label>
+          <select id="fxMode"></select>
+          <label for="fxPow" id="fxPowLbl">FORÇA</label>
+          <input id="fxPow" type="range" min="0" max="100" step="1">
+          <span id="fxPowVal" class="fx-val"></span>
+          <span id="fxK2Box" class="fx-k2 hidden">
+            <label for="fxPow2">TUBO</label>
+            <input id="fxPow2" type="range" min="0" max="100" step="1">
+            <span id="fxPow2Val" class="fx-val"></span>
+          </span>
+        </div>
+        <div class="test-tools" title="Ferramentas de teste">
+          <span class="test-lbl">TESTE</span>
+          <button id="btnInfinite" class="btn sm ghost infinite" title="$MEDO infinito para brincar de mintar">$MEDO INFINITO: DESLIGADO</button>
+          <select id="eventTest" class="event-test" title="Começa um evento agora"></select>
+        </div>
+      </div>
+      <div id="eventBadge" class="event-badge hidden"></div>
+      <div class="screen-wrap" id="screenWrap">
+        <div class="screen-col">
+          <div class="screen">
+            <canvas id="game"></canvas>
+            <canvas id="fx" class="hidden"></canvas>
+          </div>
+          <div class="stats" id="stats">
+            <div class="stat main"><span class="lbl">$MEDO</span><span id="medo" class="val">0.0000</span></div>
+            <div class="stat"><span class="lbl">FARM / HORA</span><span id="farm" class="val sm">+0.00</span><span id="farmSub" class="sub2"></span></div>
+          </div>
+        </div>
+      </div>
+      <div id="tooltip" class="tooltip hidden"></div>
+      <div id="toasts"></div>
+    </section>
+
+    <aside class="side px">
+      <nav class="tabs" id="tabs">
+        <button data-tab="mint">MINT</button>
+        <button data-tab="inv">INVENTÁRIO</button>
+        <button data-tab="forge">EVOLUÇÃO E FORJA</button>
+        <button data-tab="album">COLEÇÃO <span id="albumPill" class="pill hidden"></span></button>
+        <button data-tab="lab" class="tab-lab">TESTE</button>
+      </nav>
+      <div class="panel" id="panel"></div>
+      <footer class="side-foot">
+        <span>Esboço jogável · progresso salvo no navegador</span>
+        <span><button id="btnHelp" class="link">como jogar</button> · <button id="btnReset" class="link">reiniciar</button></span>
+      </footer>
+    </aside>
+  </main>
+
+  <div id="modal" class="modal hidden"><div id="modalBox" class="modal-box px"></div></div>
+
+  <script async src="https://unpkg.com/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/lab.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/solana.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
